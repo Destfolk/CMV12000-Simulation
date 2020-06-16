@@ -32,7 +32,7 @@ architecture Behavioral of SPI_Interface is
     signal counter_R  : std_logic_vector (4 downto 0)  := "10000";
     signal data_reg   : std_logic_vector (23 downto 0) := (others => '0');
     
-    alias R/W_bit : std_logic is data_reg(23);
+    alias R/W_bit      : std_logic is data_reg(23);
     alias Address_bits : std_logic is data_reg(22 downto 16);
     
     type Array_16x128 is array (0 to 127) of std_logic_vector(15 downto 0);
