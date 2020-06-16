@@ -110,7 +110,7 @@ begin
     Writing_TempReg : process(SPI_CLK)
     begin
         if rising_edge(SPI_CLK) and SPI_EN = '1' and counter_W /= "11000" then
-                data_reg(to_integer(unsigned(counter_W))) <= SPI_IN;
+                data_reg(index(counter_W)) <= SPI_IN;
         end if;
     end process;                                        
                     
