@@ -99,7 +99,7 @@ architecture Behavioral of SPI_Interface is
         others => (others => '0'));
     
 begin
-    process(SPI_CLK)
+    Writing_reg : process(SPI_CLK)
     begin
         if falling_edge(SPI_CLK) then
             if (SYS_RES_N = '0') then
@@ -110,14 +110,14 @@ begin
         end if;
     end process;
     
-    process(SPI_CLK)
+    Writing_TempReg : process(SPI_CLK)
     begin
         if rising_edge(SPI_CLK) and SPI_EN = '1' and counter_W /= "11000" then
                 data_reg(to_integer(unsigned(counter_W))) <= SPI_IN;
         end if;
     end process;                                        
                     
-    process(SPI_CLK)
+    Write_Counter : process(SPI_CLK)
     begin
         if falling_edge(SPI_CLK) then
             case SPI_EN is
@@ -134,7 +134,7 @@ begin
         end if;   
     end process;
     
-    process(SPI_CLK)
+    Read_Counter : process(SPI_CLK)
     begin
         if rising_edge(SPI_CLK) then
             if (R/W_bit = '1' and counter_W <= "10001") then
@@ -145,7 +145,7 @@ begin
         end if;
     end process;
     
-    process(SPI_CLK)
+    Reading_reg : process(SPI_CLK)
     begin
         if falling_edge(SPI_CLK) then
             if (counter_R <= "01111") then
