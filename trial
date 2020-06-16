@@ -25,14 +25,11 @@ end SPI_Interface;
 
 architecture Behavioral of SPI_Interface is
 
-    signal Address    : integer;
-    signal CountW_int : integer;
-    signal CountR_int : integer;
     signal counter_W  : std_logic_vector (4 downto 0)  := "11000";
     signal counter_R  : std_logic_vector (4 downto 0)  := "10000";
     signal data_reg   : std_logic_vector (23 downto 0) := (others => '0');
     
-    alias R/W_bit      : std_logic is data_reg(23);
+    alias W_not_R      : std_logic is data_reg(23);
     alias Address_bits : std_logic is data_reg(22 downto 16);
     
     type Array_16x128 is array (0 to 127) of std_logic_vector(15 downto 0);
@@ -105,7 +102,7 @@ begin
             if (SYS_RES_N = '0') then
                 sequencer_register <= sequencer_init;
             elsif (counter_W = "00000") then
-                sequencer_register(to_integer(unsigned(Address_bits))) <= data_reg(15 downto 0);
+                sequencer_register(index(Address_bits)) <= data_reg(15 downto 0);
             end if;
         end if;
     end process;
@@ -137,7 +134,7 @@ begin
     Read_Counter : process(SPI_CLK)
     begin
         if rising_edge(SPI_CLK) then
-            if (R/W_bit = '1' and counter_W <= "10001") then
+            if (W_not_R  = '1' and counter_W <= "10001") then
                 counter_R <= counter_R - 1;
             else
                 counter_R <= "10000";
@@ -149,7 +146,7 @@ begin
     begin
         if falling_edge(SPI_CLK) then
             if (counter_R <= "01111") then
-                SPI_OUT <= sequencer_register(Address)(to_integer(unsigned(counter_R)));
+                SPI_OUT <= sequencer_register(Address)(index(counter_R));
             else
                 SPI_OUT <= '0';    
             end if;                         
