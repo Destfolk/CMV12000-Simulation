@@ -99,9 +99,9 @@ begin
     CountW_int <= to_integer(unsigned(counter_W));
     Address    <= to_integer(unsigned(data_reg(22 downto 16)));
     
-    process(LVDS_CLK, SPI_CLK)
+    process(SPI_CLK)
     begin
-        if falling_edge(LVDS_CLK) then
+        if falling_edge(SPI_CLK) then
             if (SYS_RES_N = '0') then
                 sequencer_register <= sequencer_init;
             end if;
