@@ -104,8 +104,7 @@ begin
         if falling_edge(SPI_CLK) then
             if (SYS_RES_N = '0') then
                 sequencer_register <= sequencer_init;
-            end if;
-            if (counter_W = "00000") then
+            elsif (counter_W = "00000") then
                 sequencer_register(Address) <= data_reg(15 downto 0);
             end if;
         end if;
@@ -121,13 +120,17 @@ begin
     process(SPI_CLK)
     begin
         if falling_edge(SPI_CLK) then
-            if (SPI_EN = '1' and counter_W > "00000") then
-                counter_W <= counter_W - 1;
-            elsif (counter_W = "00000") then
-                counter_W <= "10111";
-            elsif (SPI_EN = '0') then
-                counter_W <= "11000";
-            end if;                           
+            case SPI_EN is
+                when '1' =>
+                    if (counter_W > "00000") then
+                        counter_W <= counter_W - 1;
+                    elsif (counter_W = "00000") then
+                        counter_W <= "10111";
+                    end if;
+                
+                when '0' =>
+                    counter_W <= "11000";
+            end case;                           
         end if;   
     end process;
     
