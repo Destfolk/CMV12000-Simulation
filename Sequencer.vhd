@@ -21,9 +21,9 @@ end Sequencer;
 
 architecture Behavioral of Sequencer is
     
-    type Array_16x128 is array (0 to 255) of std_logic_vector(15 downto 0);
+    type Array_16x256 is array (0 to 255) of std_logic_vector(15 downto 0);
     
-    shared variable sequencer_registers : Array_16x128 :=(
+    shared variable sequencer_registers : Array_16x256 :=(
         129 => "0000110000000000",
     
         195 => "0000000000000001",
