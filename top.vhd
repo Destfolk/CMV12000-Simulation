@@ -29,13 +29,13 @@ architecture Behavioral of top is
     --------------------------
     
     signal LVDS_WnR    : std_logic := '0';
-   
     signal LVDS_IN     : std_logic_vector(15 downto 0);
     signal LVDS_OUT    : std_logic_vector(15 downto 0);
     
     signal LVDS_ADDR   : std_logic_vector(7 downto 0) := "10000000";
     signal LVDS_R_ADDR : std_logic_vector(7 downto 0) := "10000000";
     signal LVDS_W_ADDR : std_logic_vector(7 downto 0) := (others =>'0');
+    signal STATE_ADDR  : std_logic_vector(1 downto 0) := (others =>'0');
     
 begin
     
@@ -71,24 +71,35 @@ begin
     begin
         if falling_edge(LVDS_CLK) then
             if (SYS_RES_N = '1') then
-                if (LVDS_WnR = '0') then
-                    LVDS_ADDR   <= LVDS_W_ADDR;
-                    LVDS_R_ADDR <= LVDS_R_ADDR + 1;
-                    LVDS_WnR    <= '1';
-                else
-                    LVDS_ADDR   <= LVDS_R_ADDR;
-                    LVDS_W_ADDR <= LVDS_W_ADDR + 1;
-                    LVDS_WnR    <= '0';    
-                end if;
+                    STATE_ADDR <= STATE_ADDR + 1;  
+                    
+                    if (STATE_ADDR = "00")then 
+                        LVDS_WnR    <= '0';
+                        LVDS_R_ADDR <= LVDS_R_ADDR + 1;
+                    elsif (STATE_ADDR = "001")then
+                        LVDS_WnR    <= '1';
+                        LVDS_IN     <= LVDS_OUT;
+                    elsif (STATE_ADDR = "10")then 
+                        LVDS_WnR    <= '1';
+                        LVDS_IN     <= LVDS_OUT;
+                        LVDS_W_ADDR <= LVDS_W_ADDR + 1;
+                        LVDS_R_ADDR <= LVDS_R_ADDR + 1;
+                    elsif (STATE_ADDR = "11")then 
+                        LVDS_WnR    <= '0';
+                        LVDS_W_ADDR <= LVDS_W_ADDR + 1;
+                        STATE_ADDR  <= "00";
+                    end if
             else
                 LVDS_WnR    <= '0';
-                LVDS_ADDR   <= "10000000";
                 LVDS_R_ADDR <= "10000000";
                 LVDS_W_ADDR <= (others =>'0');
+                STATE_ADDR  <= (others =>'0');
             end if;
         end if;                            
-    end process;            
+    end process; 
+        
+      LVDS_ADDR <= "10000000"         when SYS_RES_N = '0' 
+      else         LVDS_W_ADDR        when STATE_ADDR = "10" or STATE_ADDR = "11" 
+      else         LVDS_R_ADDR ;  
     
-    LVDS_IN   <= LVDS_OUT;
-
 end Behavioral;
