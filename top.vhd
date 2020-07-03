@@ -76,7 +76,7 @@ begin
                     if (STATE_ADDR = "00")then 
                         LVDS_WnR    <= '0';
                         LVDS_R_ADDR <= LVDS_R_ADDR + 1;
-                    elsif (STATE_ADDR = "001")then
+                    elsif (STATE_ADDR = "01")then
                         LVDS_WnR    <= '1';
                         LVDS_IN     <= LVDS_OUT;
                     elsif (STATE_ADDR = "10")then 
