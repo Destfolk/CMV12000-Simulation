@@ -1,3 +1,13 @@
+----------------------------------------------------------------------------
+--CMV12000-Simulation
+--Testbench.vhd
+--
+--Apertus AXIOM Beta
+--
+--Copyright (C) 2020 Seif Eldeen Emad Abdalazeem
+--Email: destfolk@gmail.com
+----------------------------------------------------------------------------
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.all;
@@ -20,7 +30,7 @@ architecture Behavioral of Testbench is
     signal SPI_OUT   : std_logic;
 
 begin
-    test : entity work.top(Behavioral)
+    CMV12K : entity work.top(Behavioral)
         port map(
             SPI_EN    => SPI_EN, 
             SPI_CLK   => SPI_CLK, 
@@ -51,20 +61,38 @@ begin
     
     process
     begin
+    
+        -------------------------------
+        -- Startup Sequence
+        -------------------------------
+    
         SPI_EN <= '0';
         SPI_IN <= '0';
         SYS_RES_N <= '0';
+        
         wait for T;
+        
         SYS_RES_N <= '1';
-        wait for 0.85 us;
+        
+        wait for 1 us;
+        
         SYS_RES_N <= '0';
-        SPI_EN <= '1';
+        
         wait for 0.5*T;
         
+        SPI_EN <= '1';
+        
+        -------------------------------
+        --       SPI Write
+        -- Register 42 "0101010"
+        -- Data "1010101010101010"
         -------------------------------
         
         SPI_IN <= '1';
         wait for T;
+        
+        -- Address --
+        
         SPI_IN <= '0';
         wait for T;
         
@@ -82,6 +110,8 @@ begin
         wait for T;
         SPI_IN <= '0';
         wait for T;
+        
+        -- Data --
         
         SPI_IN <= '1';
         wait for T;
@@ -124,19 +154,101 @@ begin
         wait for T;
         
         -------------------------------
+        --       SPI Write
+        -- Register 43 "0101011"
+        -- Data "1100110011001100"
+        -------------------------------
         
+        SPI_IN <= '1';
+        wait for T;
+        
+        -- Address --
+        
+        SPI_IN <= '0';
+        wait for T;
+        
+        SPI_IN <= '1';
+        wait for T;
+        SPI_IN <= '0';
+        wait for T;
+        
+        SPI_IN <= '1';
+        wait for T;
+        SPI_IN <= '0';
+        wait for T;
+        
+        SPI_IN <= '1';
+        wait for T;
+        SPI_IN <= '1';
+        wait for T;
+        
+        -- Data --
+        
+        SPI_IN <= '1';
+        wait for T;
+        SPI_IN <= '1';
+        wait for T;
+        
+        SPI_IN <= '0';
+        wait for T;
+        SPI_IN <= '0';
+        wait for T;
+        
+        SPI_IN <= '1';
+        wait for T;
+        SPI_IN <= '1';
+        wait for T;
+        
+        SPI_IN <= '0';
+        wait for T;
+        SPI_IN <= '0';
+        wait for T;
+        
+        SPI_IN <= '1';
+        wait for T;
+        SPI_IN <= '1';
+        wait for T;
+        
+        SPI_IN <= '0';
+        wait for T;
+        SPI_IN <= '0';
+        wait for T;
+        
+        SPI_IN <= '1';
+        wait for T;
+        SPI_IN <= '1';
+        wait for T;
+        
+        SPI_IN <= '0';
+        wait for T;
+        SPI_IN <= '0';
+        wait for T;
+        
+        -------------------------------
+        -- SPI Disable
+        -------------------------------
+
         SPI_IN <= '0';
         wait for 0.5*T;
         SPI_EN <= '0';
-        wait for 3*T;
+        wait for 3.5*T;
+        
+        -------------------------------
+        -- SPI Enable
+        -------------------------------
+        
         SPI_EN <= '1';
-        wait for 0.5*T;
-        -------------------------------
         
+        -------------------------------
+        --       SPI Read
+        -- Register 42 "0101010"
         -------------------------------
         
         SPI_IN <= '0';
         wait for T;
+        
+        -- Address --
+        
         SPI_IN <= '0';
         wait for T;
         
@@ -153,13 +265,68 @@ begin
         SPI_IN <= '1';
         wait for T;
         SPI_IN <= '0';
-        wait for 17*T;
-        wait for 0.5*T;
+        --addition
+       -- wait for T;
+        --SPI_IN <= '0';
         
+        wait for 17.5*T;
+        
+        -------------------------------
+        -- SPI Disable
         -------------------------------
         
         SPI_IN <= '0';
-        wait for 0.5*T;
+        SPI_EN <= '0'; 
+        
+        -------------------------------
+        -- System Reset
+        -------------------------------
+        
+        SYS_RES_N <= '1';
+        wait for 1 us;
+        SYS_RES_N <= '0';
+        
+        -------------------------------
+        -- SPI Enable
+        -------------------------------
+        
+        wait for 1.5*T;
+        
+        SPI_EN <= '1';
+        
+        -------------------------------
+        --       SPI Read
+        -- Register 88 "1011000"
+        -------------------------------
+        
+        SPI_IN <= '0';
+        wait for T;
+        
+        -- Address --
+        
+        SPI_IN <= '1';
+        wait for T;
+        
+        SPI_IN <= '0';
+        wait for T;
+        SPI_IN <= '1';
+        wait for T;
+        
+        SPI_IN <= '1';
+        wait for T;
+        SPI_IN <= '0';
+        wait for T;
+        
+        SPI_IN <= '0';
+        wait for T;
+        SPI_IN <= '0';
+        wait for 17.5*T;
+        
+        -------------------------------
+        -- SPI Disable
+        -------------------------------
+        
+        SPI_IN <= '0';
         SPI_EN <= '0';
         
         -------------------------------
