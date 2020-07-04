@@ -1,7 +1,20 @@
+----------------------------------------------------------------------------
+--CMV12000-Simulation
+--SPI_Interface.vhd
+--
+--Apertus AXIOM Beta
+--
+--Copyright (C) 2020 Seif Eldeen Emad Abdalazeem
+--Email: destfolk@gmail.com
+----------------------------------------------------------------------------
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.all;
 use ieee.std_logic_unsigned.all;
+
+library work;
+use work.Function_pkg.all;
 
 entity SPI_Interface is
     Port ( SPI_EN        : in  std_logic;
@@ -20,42 +33,47 @@ end SPI_Interface;
 
 architecture Behavioral of SPI_Interface is
     
-    signal counter_W    : std_logic_vector (4 downto 0)  := "11000";
-    signal counter_R    : std_logic_vector (4 downto 0)  := "10000";
-    signal data_reg     : std_logic_vector (23 downto 0) := (others => '0');
-    
+    signal Read_EN      : std_logic := '0';
+    signal Counter    : std_logic_vector (4 downto 0)  := "10111";
+    signal Data_Reg     : std_logic_vector (23 downto 0) := (others => '0');
+     
     alias  WnR_bit      : std_logic is data_reg(23);
     
 begin
-    ADDR          <= '0' & data_reg(22 downto 16);
-    TEMP_DATA_OUT <= data_reg(15 downto  0);
+    ADDR          <= '0' & Data_Reg(22 downto 16);
+    TEMP_DATA_OUT <= Data_Reg(15 downto  0);
+    SPI_OUT       <= TEMP_DATA_IN(index(Counter)) when Read_EN = '1' else '0';
         
-    Write_Counter : process(SPI_CLK)
+    Count : process(SPI_CLK)
     begin
         if falling_edge(SPI_CLK) then
             if (SPI_EN = '1') then
-                if (counter_W > "00000") then
-                    counter_W <= counter_W - 1;
+                if (Counter > "00000") then
+                    Counter <= Counter - 1;
                 else
-                    counter_W <= "10111";
+                    Counter <= "10111";
                 end if;
             else
-                counter_W <= "11000";
+                Counter <= "10111";
             end if;                           
         end if;   
     end process;
     
     Write_TempReg : process(SPI_CLK)
     begin
-        if rising_edge(SPI_CLK) and SPI_EN = '1' and counter_W /= "11000" then
-                data_reg(to_integer(unsigned(counter_W))) <= SPI_IN;
+        if rising_edge(SPI_CLK) then
+            if (SPI_EN = '1') then
+                Data_Reg(index(Counter)) <= SPI_IN;
+            else
+                Data_Reg <= (others => '0');
+            end if;
         end if;
     end process;
     
     Write_reg : process(SPI_CLK)
     begin
         if falling_edge(SPI_CLK) then
-            if (counter_W = "00001" and WnR_bit = '1') then
+            if (Counter = "00001" and WnR_bit = '1') then
                 W_not_R <= '1';
             else
                 W_not_R <= '0';
@@ -63,26 +81,15 @@ begin
         end if;
     end process;
     
-    Read_Counter : process(SPI_CLK)
+    Read_reg : process(SPI_CLK)
     begin
-        if rising_edge(SPI_CLK) then
-            if (WnR_bit = '0' and counter_W <= "10001") then
-                counter_R <= counter_R - 1;
+        if falling_edge(SPI_CLK) then
+            if (Counter <= "10000" and Counter > "00000" and WnR_bit = '0') then
+                Read_EN <= '1';
             else
-                counter_R <= "10000";
-            end if;    
+                Read_EN <= '0';
+            end if;
         end if;
     end process;
     
-    Reading_reg : process(SPI_CLK)
-    begin
-        if falling_edge(SPI_CLK) then
-            if (counter_R <= "01111") then
-                SPI_OUT <= TEMP_DATA_IN(to_integer(unsigned(counter_R)));
-            else
-                SPI_OUT <= '0';    
-            end if;                         
-        end if;   
-    end process;
-
 end Behavioral;
