@@ -33,11 +33,11 @@ end SPI_Interface;
 
 architecture Behavioral of SPI_Interface is
     
-    signal Read_EN      : std_logic := '0';
-    signal Counter    : std_logic_vector (4 downto 0)  := "10111";
-    signal Data_Reg     : std_logic_vector (23 downto 0) := (others => '0');
+    signal Read_EN  : std_logic := '0';
+    signal Counter  : std_logic_vector (4 downto 0)  := "10111";
+    signal Data_Reg : std_logic_vector (23 downto 0) := (others => '0');
      
-    alias  WnR_bit      : std_logic is data_reg(23);
+    alias  WnR_bit  : std_logic is data_reg(23);
     
 begin
     ADDR          <= '0' & Data_Reg(22 downto 16);
