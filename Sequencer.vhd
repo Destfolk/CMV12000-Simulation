@@ -1,6 +1,20 @@
+----------------------------------------------------------------------------
+--CMV12000-Simulation
+--Sequencer.vhd
+--
+--Apertus AXIOM Beta
+--
+--Copyright (C) 2020 Seif Eldeen Emad Abdalazeem
+--Email: destfolk@gmail.com
+----------------------------------------------------------------------------
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.all;
+use ieee.std_logic_unsigned.all;
+
+library work;
+use work.Function_pkg.all;
 
 entity Sequencer is
     Port ( -- SPI Port
@@ -21,9 +35,9 @@ end Sequencer;
 
 architecture Behavioral of Sequencer is
     
-    type Array_16x256 is array (0 to 255) of std_logic_vector(15 downto 0);
+    type Array_16x128 is array (0 to 255) of std_logic_vector(15 downto 0);
     
-    shared variable sequencer_registers : Array_16x256 :=(
+    shared variable sequencer_registers : Array_16x128 :=(
         129 => "0000110000000000",
     
         195 => "0000000000000001",
@@ -85,26 +99,25 @@ architecture Behavioral of Sequencer is
      
 begin
     SPI_Port : process(SPI_CLK)
-    begin
-        if falling_edge(SPI_CLK) then
-            if (SPI_WnR = '1') then
-                sequencer_registers(to_integer(unsigned(SPI_ADDR))) := DATA_IN;
-            elsif (SPI_WnR = '0') then
-                DATA_OUT <= sequencer_registers(to_integer(unsigned(SPI_ADDR)));
-            end if; 
-        end if;
+        begin
+            if falling_edge(SPI_CLK) then
+                if (SPI_WnR = '1') then
+                    sequencer_registers(index(SPI_ADDR)) := DATA_IN;
+                elsif (SPI_WnR = '0') then
+                    DATA_OUT <= sequencer_registers(index(SPI_ADDR));
+                end if; 
+            end if;
     end process;
     
     LVDS_Port : process(LVDS_CLK)
     begin
         if falling_edge(LVDS_CLK) then
             if (LVDS_WnR = '1') then
-                sequencer_registers(to_integer(unsigned(LVDS_ADDR))) := LVDS_IN;
+                sequencer_registers(index(LVDS_ADDR)) := LVDS_IN;
             elsif (LVDS_WnR = '0') then
-                LVDS_OUT <= sequencer_registers(to_integer(unsigned(LVDS_ADDR)));
+                LVDS_OUT <= sequencer_registers(index(LVDS_ADDR));
             end if; 
         end if;
     end process;
-    
     
 end Behavioral;
