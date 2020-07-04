@@ -3,11 +3,14 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.all;
 use ieee.std_logic_unsigned.all;
 
+library work;
+use work.Function_pkg.all;
+
 entity top is
    Port (  SPI_EN    : in  std_logic;
            SPI_CLK   : in  std_logic;
-           LVDS_CLK   : in  std_logic;
-           SYS_RES_N  : in  std_logic;
+           LVDS_CLK  : in  std_logic;
+           SYS_RES_N : in  std_logic;
            SPI_IN    : in  std_logic;
            SPI_OUT   : out std_logic
            );
@@ -39,6 +42,17 @@ architecture Behavioral of top is
     
 begin
     
+    Reg_Reset : entity work.Reg_Reset(Behavioral)
+        port map (
+           LVDS_CLK  => LVDS_CLK,
+           SYS_RES_N => SYS_RES_N,
+           --
+           LVDS_OUT  => LVDS_OUT,
+           --
+           LVDS_IN   => LVDS_IN,
+           LVDS_WnR  => LVDS_WnR,
+           LVDS_ADDR => LVDS_ADDR);
+           
     SPI_Interface : entity work.SPI_Interface(Behavioral)
         port map (
            SPI_EN        => SPI_EN,
@@ -60,46 +74,11 @@ begin
            SPI_ADDR  => SPI_ADDR,
            DATA_IN   => TEMP_DATA_OUT,
            DATA_OUT  => TEMP_DATA_IN,
-           
+           --
            LVDS_CLK  => LVDS_CLK,
            LVDS_WnR  => LVDS_WnR,
            LVDS_ADDR => LVDS_ADDR,
            LVDS_IN   => LVDS_IN,
            LVDS_OUT  => LVDS_OUT);      
-    
-    Reg_Reset : process(LVDS_CLK)
-    begin
-        if falling_edge(LVDS_CLK) then
-            if (SYS_RES_N = '1') then
-                    STATE_ADDR <= STATE_ADDR + 1;  
-                    
-                    if (STATE_ADDR = "00")then 
-                        LVDS_WnR    <= '0';
-                        LVDS_R_ADDR <= LVDS_R_ADDR + 1;
-                    elsif (STATE_ADDR = "01")then
-                        LVDS_WnR    <= '1';
-                        LVDS_IN     <= LVDS_OUT;
-                    elsif (STATE_ADDR = "10")then 
-                        LVDS_WnR    <= '1';
-                        LVDS_IN     <= LVDS_OUT;
-                        LVDS_W_ADDR <= LVDS_W_ADDR + 1;
-                        LVDS_R_ADDR <= LVDS_R_ADDR + 1;
-                    elsif (STATE_ADDR = "11")then 
-                        LVDS_WnR    <= '0';
-                        LVDS_W_ADDR <= LVDS_W_ADDR + 1;
-                        STATE_ADDR  <= "00";
-                    end if
-            else
-                LVDS_WnR    <= '0';
-                LVDS_R_ADDR <= "10000000";
-                LVDS_W_ADDR <= (others =>'0');
-                STATE_ADDR  <= (others =>'0');
-            end if;
-        end if;                            
-    end process; 
-        
-      LVDS_ADDR <= "10000000"         when SYS_RES_N = '0' 
-      else         LVDS_W_ADDR        when STATE_ADDR = "10" or STATE_ADDR = "11" 
-      else         LVDS_R_ADDR ;  
     
 end Behavioral;
