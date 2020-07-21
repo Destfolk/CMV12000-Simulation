@@ -41,7 +41,8 @@ architecture Behavioral of top is
     -- LVDS Port Signals
     --------------------------
     
-    signal LVDS_WnR    : std_logic := '0';
+    signal LVDS_W      : std_logic := '0';
+    signal LVDS_R      : std_logic := '0';
     signal LVDS_IN     : std_logic_vector(15 downto 0);
     signal LVDS_OUT    : std_logic_vector(15 downto 0);
     
@@ -52,16 +53,33 @@ architecture Behavioral of top is
     
 begin
     
-    Reg_Reset : entity work.Reg_Reset(Behavioral)
+     Reg_Reset : entity work.Reg_Reset(Behavioral)
         port map (
            LVDS_CLK  => LVDS_CLK,
            SYS_RES_N => SYS_RES_N,
            --
            LVDS_OUT  => LVDS_OUT,
-           --
            LVDS_IN   => LVDS_IN,
-           LVDS_WnR  => LVDS_WnR,
+           --
+           LVDS_W    => LVDS_W,
+           LVDS_R    => LVDS_R,
+           --
            LVDS_ADDR => LVDS_ADDR);
+           
+    Registers : entity work.Sequencer(Behavioral)
+        port map (
+           SPI_CLK   => SPI_CLK,
+           SPI_WnR   => SPI_WnR,
+           SPI_ADDR  => SPI_ADDR,
+           DATA_IN   => TEMP_DATA_OUT,
+           DATA_OUT  => TEMP_DATA_IN,
+           --
+           LVDS_CLK  => LVDS_CLK,
+           LVDS_W    => LVDS_W,
+           LVDS_R    => LVDS_R,
+           LVDS_ADDR => LVDS_ADDR,
+           LVDS_IN   => LVDS_IN,
+           LVDS_OUT  => LVDS_OUT);
            
     SPI_Interface : entity work.SPI_Interface(Behavioral)
         port map (
@@ -76,19 +94,5 @@ begin
            --
            TEMP_DATA_IN  => TEMP_DATA_IN,
            TEMP_DATA_OUT => TEMP_DATA_OUT);
-    
-    Registers : entity work.Sequencer(Behavioral)
-        port map (
-           SPI_CLK   => SPI_CLK,
-           SPI_WnR   => SPI_WnR,
-           SPI_ADDR  => SPI_ADDR,
-           DATA_IN   => TEMP_DATA_OUT,
-           DATA_OUT  => TEMP_DATA_IN,
-           --
-           LVDS_CLK  => LVDS_CLK,
-           LVDS_WnR  => LVDS_WnR,
-           LVDS_ADDR => LVDS_ADDR,
-           LVDS_IN   => LVDS_IN,
-           LVDS_OUT  => LVDS_OUT);      
     
 end Behavioral;
