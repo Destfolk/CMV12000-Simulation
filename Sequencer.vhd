@@ -26,7 +26,8 @@ entity Sequencer is
              
            -- LVDS Port
            LVDS_CLK  : in  std_logic;
-           LVDS_WnR : in  std_logic;
+           LVDS_W    : in  std_logic;
+           LVDS_R    : in  std_logic;
            LVDS_ADDR : in  std_logic_vector(7 downto  0);
            LVDS_IN   : in  std_logic_vector(15 downto 0);
            LVDS_OUT  : out std_logic_vector(15 downto 0)
@@ -34,12 +35,14 @@ entity Sequencer is
 end Sequencer;
 
 architecture Behavioral of Sequencer is
+
+    signal LVDS_REG : std_logic_vector(15 downto 0);
     
     type Array_16x255 is array (0 to 255) of std_logic_vector(15 downto 0);
     
     shared variable sequencer_registers : Array_16x255 :=(
         129 => "0000110000000000",
-    
+        
         195 => "0000000000000001",
         196 => "0000000000001001",
     
@@ -103,19 +106,26 @@ begin
             if falling_edge(SPI_CLK) then
                 if (SPI_WnR = '1') then
                     sequencer_registers(index(SPI_ADDR)) := DATA_IN;
-                elsif (SPI_WnR = '0') then
-                    DATA_OUT <= sequencer_registers(index(SPI_ADDR));
                 end if; 
+                DATA_OUT <= sequencer_registers(index(SPI_ADDR));
             end if;
     end process;
     
     LVDS_Port : process(LVDS_CLK)
     begin
-        if falling_edge(LVDS_CLK) then
-            if (LVDS_WnR = '1') then
+        if rising_edge(LVDS_CLK) then
+            if (LVDS_W = '1') then
                 sequencer_registers(index(LVDS_ADDR)) := LVDS_IN;
-            elsif (LVDS_WnR = '0') then
-                LVDS_OUT <= sequencer_registers(index(LVDS_ADDR));
+            end if;
+            LVDS_REG <= sequencer_registers(index(LVDS_ADDR));
+        end if;
+    end process;
+    
+    LVDS_OUT_REG : process(LVDS_CLK)
+    begin
+        if rising_edge(LVDS_CLK) then
+            if (LVDS_R = '1') then
+                LVDS_OUT <= LVDS_REG;
             end if; 
         end if;
     end process;
