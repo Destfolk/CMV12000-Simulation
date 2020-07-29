@@ -38,7 +38,7 @@ architecture Behavioral of SPI_Interface is
     signal Counter_R : std_logic_vector (4 downto 0)  := "01111";
     signal Data_Reg  : std_logic_vector (23 downto 0) := (others => '0');
      
-    alias  WnR_bit  : std_logic is data_reg(23);
+    alias  WnR_bit   : std_logic is data_reg(23);
     
 begin
     ADDR          <= '0' & Data_Reg(22 downto 16);
