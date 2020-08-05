@@ -68,11 +68,11 @@ entity top_gw is
 	hdmi_south_d_p : out std_logic_vector (2 downto 0);
 	hdmi_south_d_n : out std_logic_vector (2 downto 0);
 	--
-    /*	hdmi_north_clk_p : out std_logic;
-	hdmi_north_clk_n : out std_logic;
+    --hdmi_north_clk_p : out std_logic;
+	--hdmi_north_clk_n : out std_logic;
 	--
-	hdmi_north_d_p : out std_logic_vector (2 downto 0);
-	hdmi_north_d_n : out std_logic_vector (2 downto 0);	*/
+	--hdmi_north_d_p : out std_logic_vector (2 downto 0);
+	--hdmi_north_d_n : out std_logic_vector (2 downto 0);	
 	--
 	debug_tmds: out std_logic_vector (3 downto 0);
 	debug : out std_logic_vector (3 downto 0)
@@ -575,19 +575,19 @@ begin
 	    spi_out => spi_out,
 	    spi_en => spi_en );
 	
-    --------------------------------------------------------------------
+	--------------------------------------------------------------------
     -- CMV 12000 Sensor
     --------------------------------------------------------------------
         
     CMV12K : entity work.top(Behavioral)
         port map(
-            SPI_EN    => SPI_EN, 
-            SPI_CLK   => SPI_CLK, 
+            SPI_EN    => spi_en, 
+            SPI_CLK   => spi_clk, 
             --
             LVDS_CLK  => cmv_lvds_clk, 
             SYS_RES_N => SYS_RES_N,
             --
-            SPI_IN    => SPI_IN,
-            SPI_OUT   => SPI_OUT);	    
+            SPI_IN    => spi_in,
+            SPI_OUT   => spi_out);	    
 
 end RTL;
