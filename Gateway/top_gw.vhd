@@ -532,27 +532,27 @@ begin
 
         m_axi0_aclk <= clk_100;
         
-        axi_split_inst0 : entity work.axi_split8
-        generic map (
-            SPLIT_BIT0 => 20,
-            SPLIT_BIT1 => 21,
-            SPLIT_BIT2 => 22 )
-        port map (
-            s_axi_aclk => m_axi0_aclk,
-            s_axi_areset_n => m_axi0_areset_n,
-            --
-            s_axi_ro => m_axi0l_ri,
-            s_axi_ri => m_axi0l_ro,
-            s_axi_wo => m_axi0l_wi,
-            s_axi_wi => m_axi0l_wo,
-            --
-            m_axi_aclk => m_axi0a_aclk,
-            m_axi_areset_n => m_axi0a_areset_n,
-            --
-            m_axi_ri => m_axi0a_ri,
-            m_axi_ro => m_axi0a_ro,
-            m_axi_wi => m_axi0a_wi,
-            m_axi_wo => m_axi0a_wo );
+    axi_split_inst0 : entity work.axi_split8
+    generic map (
+        SPLIT_BIT0 => 20,
+        SPLIT_BIT1 => 21,
+        SPLIT_BIT2 => 22 )        
+    port map (
+        s_axi_aclk => m_axi0_aclk,
+        s_axi_areset_n => m_axi0_areset_n,
+        --
+        s_axi_ro => m_axi0l_ri,
+        s_axi_ri => m_axi0l_ro,
+        s_axi_wo => m_axi0l_wi,
+        s_axi_wi => m_axi0l_wo,
+        --
+        m_axi_aclk => m_axi0a_aclk,
+        m_axi_areset_n => m_axi0a_areset_n,
+        --
+        m_axi_ri => m_axi0a_ri,
+        m_axi_ro => m_axi0a_ro,
+        m_axi_wi => m_axi0a_wi,
+        m_axi_wo => m_axi0a_wo );                 
             
     --------------------------------------------------------------------
     -- CMV SPI Interface
@@ -574,5 +574,20 @@ begin
 	    spi_in => spi_in,
 	    spi_out => spi_out,
 	    spi_en => spi_en );
+	
+    --------------------------------------------------------------------
+    -- CMV 12000 Sensor
+    --------------------------------------------------------------------
+        
+    CMV12K : entity work.top(Behavioral)
+        port map(
+            SPI_EN    => SPI_EN, 
+            SPI_CLK   => SPI_CLK, 
+            --
+            LVDS_CLK  => cmv_lvds_clk, 
+            SYS_RES_N => SYS_RES_N,
+            --
+            SPI_IN    => SPI_IN,
+            SPI_OUT   => SPI_OUT);	    
 
 end RTL;
