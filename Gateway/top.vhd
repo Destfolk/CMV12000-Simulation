@@ -594,7 +594,7 @@ begin
             SPI_CLK   => spi_clk, 
             --
             LVDS_CLK  => cmv_lvds_clk, 
-            SYS_RES_N => SYS_RES_N,
+            SYS_RES_N => emio_gpio_o(0),
             --
             SPI_IN    => spi_in,
             SPI_OUT   => spi_out);	    
