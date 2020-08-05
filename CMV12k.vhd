@@ -16,7 +16,7 @@ use ieee.std_logic_unsigned.all;
 library work;
 use work.Function_pkg.all;
 
-entity top is
+entity CMV12k is
    Port (  SPI_EN    : in  std_logic;
            SPI_CLK   : in  std_logic;
            LVDS_CLK  : in  std_logic;
@@ -24,9 +24,9 @@ entity top is
            SPI_IN    : in  std_logic;
            SPI_OUT   : out std_logic
            );
-end top;
+end CMV12k;
 
-architecture Behavioral of top is
+architecture Behavioral of CMV12k is
     
     --------------------------
     -- SPI Port Signals
