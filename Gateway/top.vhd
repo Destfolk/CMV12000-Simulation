@@ -39,10 +39,10 @@ entity top is
 	i2c_scl : inout std_ulogic;
 	i2c_sda : inout std_ulogic;
 	--
-	spi_en : out std_ulogic;
-	spi_clk : out std_ulogic;
-	spi_in : out std_ulogic;
-	spi_out : in std_ulogic;
+	--spi_en : out std_ulogic;
+	--spi_clk : out std_ulogic;
+	--spi_in : out std_ulogic;
+	--spi_out : in std_ulogic;
 	--
 	cmv_clk : out std_ulogic;
 	cmv_sys_res_n : out std_ulogic;
@@ -203,6 +203,15 @@ architecture RTL of top is
     signal cmv_spi_clk : std_ulogic;
     signal cmv_axi_clk : std_ulogic;
     signal cmv_dly_clk : std_ulogic;
+    
+    --------------------------------------------------------------------
+    -- CMV SPI Signals
+    --------------------------------------------------------------------
+
+    signal spi_en  : std_ulogic;
+    signal spi_clk : std_ulogic;
+    signal spi_in  : std_ulogic;
+    signal spi_out : std_ulogic;
 
 begin
 
@@ -574,7 +583,7 @@ begin
 	    spi_in => spi_in,
 	    spi_out => spi_out,
 	    spi_en => spi_en );
-	
+	 
     --------------------------------------------------------------------
     -- CMV 12000 Sensor
     --------------------------------------------------------------------
