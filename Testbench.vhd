@@ -30,7 +30,7 @@ architecture Behavioral of Testbench is
     signal SPI_OUT   : std_logic;
 
 begin
-    CMV12K : entity work.top(Behavioral)
+    CMV12K : entity work.CMV12k(Behavioral)
         port map(
             SPI_EN    => SPI_EN, 
             SPI_CLK   => SPI_CLK, 
