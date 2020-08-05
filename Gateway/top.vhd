@@ -34,7 +34,7 @@ use work.vivado_pkg.ALL;	-- Vivado Attributes
 
 
 
-entity top_gw is
+entity top is
     port (
 	i2c_scl : inout std_ulogic;
 	i2c_sda : inout std_ulogic;
@@ -78,10 +78,10 @@ entity top_gw is
 	debug : out std_logic_vector (3 downto 0)
     );
 
-end entity top_gw;
+end entity top;
 
 
-architecture RTL of top_gw is
+architecture RTL of top is
 
     attribute KEEP_HIERARCHY of RTL : architecture is "TRUE";
 
@@ -579,7 +579,7 @@ begin
     -- CMV 12000 Sensor
     --------------------------------------------------------------------
         
-    CMV12K : entity work.top(Behavioral)
+    CMV12K : entity work.CMV12k(Behavioral)
         port map(
             SPI_EN    => spi_en, 
             SPI_CLK   => spi_clk, 
