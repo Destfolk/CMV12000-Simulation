@@ -102,7 +102,7 @@ begin
 
     enable <= enable_a xor enable_b;
     spi_en <= enable;
-    --spi_clk <= spi_clk_in when enable = '1' else '0';
+    -- spi_clk <= spi_clk_in when enable = '1' else '0';
     -- spi_clk <= spi_clk_in when enable = '1' and spi_action = '0' else '0';
 
     --------------------------------------------------------------------
