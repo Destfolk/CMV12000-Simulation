@@ -601,6 +601,6 @@ begin
             SPI_IN    => spi_in,
             SPI_OUT   => spi_out);	    
     
-    emio_gpio_o(1) <= emio_gpio_o(0);
+    emio_gpio_i(1) <= emio_gpio_o(0);
     
 end RTL;
