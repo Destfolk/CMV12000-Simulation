@@ -18,6 +18,8 @@ use IEEE.numeric_std.ALL;
 
 use work.vivado_pkg.ALL;	-- Vivado Attributes
 
+Library UNISIM;
+use UNISIM.vcomponents.all;
 
 entity cmv_spi is
     port (
@@ -56,7 +58,14 @@ architecture RTL of cmv_spi is
 	:= (others => '0');
 
 begin
-
+    
+    BUFGCE_inst : BUFGCE
+    port map (
+        O  => spi_clk, 
+        CE => enable, 
+        I  => spi_clk_in 
+        );
+        
     --------------------------------------------------------------------
     -- CMV SPI Sequence
     --------------------------------------------------------------------
@@ -93,7 +102,7 @@ begin
 
     enable <= enable_a xor enable_b;
     spi_en <= enable;
-    spi_clk <= spi_clk_in when enable = '1' else '0';
+    --spi_clk <= spi_clk_in when enable = '1' else '0';
     -- spi_clk <= spi_clk_in when enable = '1' and spi_action = '0' else '0';
 
     --------------------------------------------------------------------
