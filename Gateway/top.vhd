@@ -35,9 +35,9 @@ use work.vivado_pkg.ALL;	-- Vivado Attributes
 
 
 entity top is
-    port (
-	i2c_scl : inout std_ulogic;
-	i2c_sda : inout std_ulogic;
+    --port (
+	--i2c_scl : inout std_ulogic;
+	--i2c_sda : inout std_ulogic;
 	--
 	--spi_en : out std_ulogic;
 	--spi_clk : out std_ulogic;
@@ -53,14 +53,14 @@ entity top is
 	--cmv_lvds_clk_p : out std_logic;
 	--cmv_lvds_clk_n : out std_logic;
 	--
-	cmv_lvds_outclk_p : in std_logic;
-	cmv_lvds_outclk_n : in std_logic;
+	--cmv_lvds_outclk_p : in std_logic;
+	--cmv_lvds_outclk_n : in std_logic;
 	--
-	cmv_lvds_data_p : in unsigned(31 downto 0);
-	cmv_lvds_data_n : in unsigned(31 downto 0);
+	--cmv_lvds_data_p : in unsigned(31 downto 0);
+	--cmv_lvds_data_n : in unsigned(31 downto 0);
 	--
-	cmv_lvds_ctrl_p : in std_logic;
-	cmv_lvds_ctrl_n : in std_logic
+	--cmv_lvds_ctrl_p : in std_logic;
+	--cmv_lvds_ctrl_n : in std_logic
 	--
 	--hdmi_south_clk_p : out std_logic;
 	--hdmi_south_clk_n : out std_logic
@@ -76,7 +76,7 @@ entity top is
 	--
 	--debug_tmds: out std_logic_vector (3 downto 0);
 	--debug : out std_logic_vector (3 downto 0)
-    );
+    --);
 
 end entity top;
 
