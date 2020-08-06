@@ -44,14 +44,14 @@ entity top is
 	--spi_in : out std_ulogic;
 	--spi_out : in std_ulogic;
 	--
-	cmv_clk : out std_ulogic;
-	cmv_sys_res_n : out std_ulogic;
-	cmv_frame_req : out std_ulogic;
-	cmv_t_exp1 : out std_ulogic;
-	cmv_t_exp2 : out std_ulogic;
+	--cmv_clk : out std_ulogic;
+	--cmv_sys_res_n : out std_ulogic;
+	--cmv_frame_req : out std_ulogic;
+	--cmv_t_exp1 : out std_ulogic;
+	--cmv_t_exp2 : out std_ulogic;
 	--
-	cmv_lvds_clk_p : out std_logic;
-	cmv_lvds_clk_n : out std_logic;
+	--cmv_lvds_clk_p : out std_logic;
+	--cmv_lvds_clk_n : out std_logic;
 	--
 	cmv_lvds_outclk_p : in std_logic;
 	cmv_lvds_outclk_n : in std_logic;
@@ -60,22 +60,22 @@ entity top is
 	cmv_lvds_data_n : in unsigned(31 downto 0);
 	--
 	cmv_lvds_ctrl_p : in std_logic;
-	cmv_lvds_ctrl_n : in std_logic;
+	cmv_lvds_ctrl_n : in std_logic
 	--
-	hdmi_south_clk_p : out std_logic;
-	hdmi_south_clk_n : out std_logic;
+	--hdmi_south_clk_p : out std_logic;
+	--hdmi_south_clk_n : out std_logic
 	--
-	hdmi_south_d_p : out std_logic_vector (2 downto 0);
-	hdmi_south_d_n : out std_logic_vector (2 downto 0);
+	--hdmi_south_d_p : out std_logic_vector (2 downto 0);
+	--hdmi_south_d_n : out std_logic_vector (2 downto 0);
 	--
-    --hdmi_north_clk_p : out std_logic;
+        --hdmi_north_clk_p : out std_logic;
 	--hdmi_north_clk_n : out std_logic;
 	--
 	--hdmi_north_d_p : out std_logic_vector (2 downto 0);
 	--hdmi_north_d_n : out std_logic_vector (2 downto 0);	
 	--
-	debug_tmds: out std_logic_vector (3 downto 0);
-	debug : out std_logic_vector (3 downto 0)
+	--debug_tmds: out std_logic_vector (3 downto 0);
+	--debug : out std_logic_vector (3 downto 0)
     );
 
 end entity top;
@@ -506,7 +506,7 @@ begin
     -- CMV PLL
     --------------------------------------------------------------------
 
-    cmv_pll_inst : entity work.cmv_pll (RTL_250MHZ)
+    cmv_pll_inst : entity work.cmv_pll (RTL_300MHZ)
 	port map (
 	    ref_clk_in => clk_100,
 	    --
@@ -518,7 +518,7 @@ begin
 	    spi_clk => cmv_spi_clk,
 	    axi_clk => cmv_axi_clk );
 
-        cmv_clk <= cmv_cmd_clk;
+        --cmv_clk <= cmv_cmd_clk;
 
     --------------------------------------------------------------------
     -- AXI3 CMV Interconnect
