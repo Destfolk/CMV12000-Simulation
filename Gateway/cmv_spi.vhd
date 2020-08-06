@@ -45,7 +45,8 @@ end entity cmv_spi;
 
 architecture RTL of cmv_spi is
 
-    attribute KEEP_HIERARCHY of RTL : architecture is "TRUE";
+    attribute KEEP_HIERARCHY of RTL         : architecture is "TRUE";
+    attribute DONT_TOUCH     of BUFGCE_inst : label        is "TRUE";
 
     signal enable_a : std_logic := '0';
     signal enable_b : std_logic := '0';
@@ -58,6 +59,7 @@ architecture RTL of cmv_spi is
 	:= (others => '0');
 
 begin
+    
     
     BUFGCE_inst : BUFGCE
     port map (
@@ -102,7 +104,7 @@ begin
 
     enable <= enable_a xor enable_b;
     spi_en <= enable;
-    -- spi_clk <= spi_clk_in when enable = '1' else '0';
+    --spi_clk <= spi_clk_in when enable = '1' else '0';
     -- spi_clk <= spi_clk_in when enable = '1' and spi_action = '0' else '0';
 
     --------------------------------------------------------------------
