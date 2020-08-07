@@ -502,7 +502,10 @@ begin
     clk_100 <= ps_fclk(0);
 
     -- cmv_sys_res_n <= '1';
-
+    
+    emio_gpio_i(0) <= '1';
+    emio_gpio_i(1) <= emio_gpio_o(2);
+    emio_gpio_i(2) <= emio_gpio_o(0);
 
     --------------------------------------------------------------------
     -- CMV PLL
@@ -596,11 +599,9 @@ begin
             SPI_CLK   => spi_clk, 
             --
             LVDS_CLK  => cmv_lvds_clk, 
-            SYS_RES_N => emio_gpio_o(2),
+            SYS_RES_N => emio_gpio_o(3),
             --
             SPI_IN    => spi_in,
             SPI_OUT   => spi_out);	    
-    
-    emio_gpio_i(1) <= emio_gpio_o(0);
     
 end RTL;
