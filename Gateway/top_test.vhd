@@ -588,7 +588,7 @@ begin
 	    spi_in => spi_in,
 	    spi_out => spi_out,
 	    spi_en => spi_en,
-	    emio_gpio_o_num => emio_gpio_o(3));
+	    not_loopback => emio_gpio_o(3));
 	 
 	--------------------------------------------------------------------
     -- CMV 12000 Sensor
