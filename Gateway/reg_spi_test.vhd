@@ -142,7 +142,7 @@ begin
     
     shift_reg_test : process(spi_clk_in)
     begin
-        if falling_edge(spi_clk_in) then
+        if rising_edge(spi_clk_in) then
             shift_reg(0) <= spi_test_in;
             shift_reg(1) <= shift_reg(0);
             shift_reg(2) <= shift_reg(1);
