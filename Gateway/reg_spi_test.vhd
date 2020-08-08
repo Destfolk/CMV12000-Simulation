@@ -41,7 +41,7 @@ entity reg_spi is
 	spi_in : out std_logic;
 	spi_out : in std_logic;
 	
-	emio_gpio_o_num : in std_logic
+	not_loopback : in std_logic
     );
 end entity reg_spi;
 
@@ -92,10 +92,9 @@ architecture RTL of reg_spi is
     
     signal spi_test_in  : std_logic;
     signal spi_test_out : std_logic;
+    signal shift_reg    : std_logic_vector(8 downto 0) := (others => '0');
     
 begin
-    spi_in       <= spi_test_in when emio_gpio_o_num = '1' else '0';
-    spi_test_out <= spi_out     when emio_gpio_o_num = '1' else spi_test_in;
     
     pp_reg_sync_inst : entity work.pp_reg_sync
 	generic map (
@@ -136,7 +135,24 @@ begin
 	    spi_en => spi_en,
 	    spi_in => spi_test_in,
 	    spi_out => spi_test_out );
-
+	    
+	    
+    spi_in       <= spi_test_in when not_loopback = '1' else '0';
+    spi_test_out <= spi_out     when not_loopback = '1' else shift_reg(7);
+    
+    shift_reg_test : process(spi_clk_in)
+    begin
+        if falling_edge(spi_clk_in) then
+            shift_reg(0) <= spi_test_in;
+            shift_reg(1) <= shift_reg(0);
+            shift_reg(2) <= shift_reg(1);
+            shift_reg(3) <= shift_reg(2);
+            shift_reg(4) <= shift_reg(3);
+            shift_reg(5) <= shift_reg(4);
+            shift_reg(6) <= shift_reg(5);
+            shift_reg(7) <= shift_reg(6);
+        end if;
+    end process;        
     --------------------------------------------------------------------
     -- One Clock Cycle Trigger
     --------------------------------------------------------------------
