@@ -138,7 +138,7 @@ begin
 	    
 	    
     spi_in       <= spi_test_in when not_loopback = '1' else '0';
-    spi_test_out <= spi_out     when not_loopback = '1' else shift_reg(7);
+    spi_test_out <= spi_out     when not_loopback = '1' else shift_reg(8);
     
     shift_reg_test : process(spi_clk_in)
     begin
@@ -151,6 +151,7 @@ begin
             shift_reg(5) <= shift_reg(4);
             shift_reg(6) <= shift_reg(5);
             shift_reg(7) <= shift_reg(6);
+            shift_reg(8) <= shift_reg(7);
         end if;
     end process;        
     --------------------------------------------------------------------
