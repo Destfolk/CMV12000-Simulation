@@ -100,7 +100,7 @@ begin
     Read_reg : process(SPI_CLK)
     begin
         if falling_edge(SPI_CLK) then
-            if (Counter_W < "10000" and Counter_W > "00000" and WnR_bit = '0') then
+            if (Counter_W < "10000" and WnR_bit = '0') then
                 Read_EN <= '1';
             else
                 Read_EN <= '0';
