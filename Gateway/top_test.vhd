@@ -214,7 +214,6 @@ architecture RTL of top is
     signal spi_out : std_ulogic;
     
     --attribute GATED_CLOCK of spi_clk : signal is "TRUE";
-
 begin
 
     --------------------------------------------------------------------
@@ -503,10 +502,6 @@ begin
 
     -- cmv_sys_res_n <= '1';
     
-    emio_gpio_i(0) <= '1';
-    emio_gpio_i(1) <= emio_gpio_o(2);
-    emio_gpio_i(2) <= emio_gpio_o(0);
-
     --------------------------------------------------------------------
     -- CMV PLL
     --------------------------------------------------------------------
@@ -588,7 +583,30 @@ begin
 	    spi_in => spi_in,
 	    spi_out => spi_out,
 	    spi_en => spi_en,
-	    not_loopback => emio_gpio_o(3));
+	    --
+	    not_loopback   => emio_gpio_o(0),
+	    --
+	    spi_clk_in_tst => emio_gpio_o(56),
+	    
+	    spi_action_tst => emio_gpio_o(57),
+	    spi_active_tst => emio_gpio_i(58),
+	    
+	    spi_write_tst  => emio_gpio_o(59),
+	    spi_addr_tst   => emio_gpio_o(23 downto 17),
+	    spi_din_tst    => emio_gpio_o(39 downto 24),
+	    
+	    spi_dout_tst   => emio_gpio_i(55 downto 40),
+	    spi_latch_tst  => emio_gpio_i(60),
+	    
+	    spi_clk_tst    => spi_clk,
+	    spi_en_tst     => spi_en,
+	    spi_in_tst     => spi_in,
+	    spi_out_tst    => spi_out);
+	 
+	 emio_gpio_i(61) <= spi_clk;
+	 emio_gpio_i(62) <= spi_en;
+	 emio_gpio_i(63) <= spi_in;
+	 emio_gpio_o(64) <= spi_out;
 	 
 	--------------------------------------------------------------------
     -- CMV 12000 Sensor
@@ -599,10 +617,13 @@ begin
             SPI_EN    => spi_en, 
             SPI_CLK   => spi_clk, 
             --
-            LVDS_CLK  => cmv_lvds_clk, 
+            LVDS_CLK  => emio_gpio_o(2), 
             SYS_RES_N => emio_gpio_o(3),
             --
             SPI_IN    => spi_in,
-            SPI_OUT   => spi_out);	    
+            SPI_OUT   => spi_out,
+            Counter_W => emio_gpio_i(10 downto 6),
+            Counter_R => emio_gpio_i(15 downto 11),
+            Read_EN   => emio_gpio_i(16));	    
     
 end RTL;
