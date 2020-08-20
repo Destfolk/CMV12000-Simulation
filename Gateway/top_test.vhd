@@ -502,111 +502,35 @@ begin
 
     -- cmv_sys_res_n <= '1';
     
-    --------------------------------------------------------------------
-    -- CMV PLL
-    --------------------------------------------------------------------
-
-    cmv_pll_inst : entity work.cmv_pll (RTL_300MHZ)
-	port map (
-	    ref_clk_in => clk_100,
-	    --
-	    pll_locked => cmv_pll_locked,
-	    --
-	    lvds_clk => cmv_lvds_clk,
-	    dly_clk => cmv_dly_clk,
-	    cmv_clk => cmv_cmd_clk,
-	    spi_clk => cmv_spi_clk,
-	    axi_clk => cmv_axi_clk );
-
-        --cmv_clk <= cmv_cmd_clk;
-
-    --------------------------------------------------------------------
-    -- AXI3 CMV Interconnect
-    --------------------------------------------------------------------
-
-    axi_lite_inst0 : entity work.axi_lite
-	port map (
-	    s_axi_aclk => m_axi0_aclk,
-	    s_axi_areset_n => m_axi0_areset_n,
-
-	    s_axi_ro => m_axi0_ri,
-	    s_axi_ri => m_axi0_ro,
-	    s_axi_wo => m_axi0_wi,
-	    s_axi_wi => m_axi0_wo,
-
-	    m_axi_ro => m_axi0l_ro,
-	    m_axi_ri => m_axi0l_ri,
-	    m_axi_wo => m_axi0l_wo,
-	    m_axi_wi => m_axi0l_wi );
-
-        m_axi0_aclk <= clk_100;
-        
-    axi_split_inst0 : entity work.axi_split8
-    generic map (
-        SPLIT_BIT0 => 20,
-        SPLIT_BIT1 => 21,
-        SPLIT_BIT2 => 22 )        
-    port map (
-        s_axi_aclk => m_axi0_aclk,
-        s_axi_areset_n => m_axi0_areset_n,
-        --
-        s_axi_ro => m_axi0l_ri,
-        s_axi_ri => m_axi0l_ro,
-        s_axi_wo => m_axi0l_wi,
-        s_axi_wi => m_axi0l_wo,
-        --
-        m_axi_aclk => m_axi0a_aclk,
-        m_axi_areset_n => m_axi0a_areset_n,
-        --
-        m_axi_ri => m_axi0a_ri,
-        m_axi_ro => m_axi0a_ro,
-        m_axi_wi => m_axi0a_wi,
-        m_axi_wo => m_axi0a_wo );                 
+                  
             
     --------------------------------------------------------------------
     -- CMV SPI Interface
     --------------------------------------------------------------------
 
-    reg_spi_inst : entity work.reg_spi
+    spi_inst : entity work.cmv_spi
 	port map (
-	    s_axi_aclk => m_axi0a_aclk(0),
-	    s_axi_areset_n => m_axi0a_areset_n(0),
+	    spi_clk_in => emio_gpio_o(0),
 	    --
-	    s_axi_ro => m_axi0a_ri(0),
-	    s_axi_ri => m_axi0a_ro(0),
-	    s_axi_wo => m_axi0a_wi(0),
-	    s_axi_wi => m_axi0a_wo(0),
+	    spi_action => emio_gpio_o(1),
+	    spi_active => emio_gpio_i(2),
 	    --
-	    spi_clk_in => cmv_spi_clk,
+	    spi_write => emio_gpio_o(3),
+	    spi_addr => emio_gpio_o(11 downto 5),
+	    spi_din => emio_gpio_o(27 downto 12),
+	    --
+	    spi_dout => emio_gpio_i(43 downto 28),
+	    spi_latch => emio_gpio_i(4),
 	    --
 	    spi_clk => spi_clk,
-	    spi_in => spi_in,
-	    spi_out => spi_out,
 	    spi_en => spi_en,
-	    --
-	    not_loopback   => emio_gpio_o(0),
-	    --
-	    spi_clk_in_tst => emio_gpio_o(56),
-	    
-	    spi_action_tst => emio_gpio_o(57),
-	    spi_active_tst => emio_gpio_i(58),
-	    
-	    spi_write_tst  => emio_gpio_o(59),
-	    spi_addr_tst   => emio_gpio_o(23 downto 17),
-	    spi_din_tst    => emio_gpio_o(39 downto 24),
-	    
-	    spi_dout_tst   => emio_gpio_i(55 downto 40),
-	    spi_latch_tst  => emio_gpio_i(60),
-	    
-	    spi_clk_tst    => spi_clk,
-	    spi_en_tst     => spi_en,
-	    spi_in_tst     => spi_in,
-	    spi_out_tst    => spi_out);
+	    spi_in => spi_in,
+	    spi_out => spi_out );
 	 
-	 emio_gpio_i(0) <= spi_clk;
-	 emio_gpio_i(1) <= spi_en;
-	 emio_gpio_i(4) <= spi_in;
-	 emio_gpio_o(5) <= spi_out;
+	 emio_gpio_i(44) <= spi_clk;
+	 emio_gpio_i(45) <= spi_en;
+	 emio_gpio_i(46) <= spi_in;
+	 emio_gpio_o(47) <= spi_out;
 	 
 	--------------------------------------------------------------------
     -- CMV 12000 Sensor
@@ -617,13 +541,13 @@ begin
             SPI_EN    => spi_en, 
             SPI_CLK   => spi_clk, 
             --
-            LVDS_CLK  => emio_gpio_o(2), 
-            SYS_RES_N => emio_gpio_o(3),
+            LVDS_CLK  => emio_gpio_o(48), 
+            SYS_RES_N => emio_gpio_o(49),
             --
             SPI_IN    => spi_in,
             SPI_OUT   => spi_out,
-            Counter_W => emio_gpio_i(10 downto 6),
-            Counter_R => emio_gpio_i(15 downto 11),
-            Read_EN   => emio_gpio_i(16));	    
+            Counter_W => emio_gpio_i(54 downto 50),
+            Counter_R => emio_gpio_i(59 downto 55),
+            Read_EN   => emio_gpio_i(60));	    
     
 end RTL;
