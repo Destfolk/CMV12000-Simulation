@@ -603,10 +603,10 @@ begin
 	    spi_in_tst     => spi_in,
 	    spi_out_tst    => spi_out);
 	 
-	 emio_gpio_i(61) <= spi_clk;
-	 emio_gpio_i(62) <= spi_en;
-	 emio_gpio_i(63) <= spi_in;
-	 emio_gpio_o(64) <= spi_out;
+	 emio_gpio_i(0) <= spi_clk;
+	 emio_gpio_i(1) <= spi_en;
+	 emio_gpio_i(4) <= spi_in;
+	 emio_gpio_o(5) <= spi_out;
 	 
 	--------------------------------------------------------------------
     -- CMV 12000 Sensor
