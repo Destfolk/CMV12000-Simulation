@@ -31,7 +31,7 @@ entity Reg_Reset is
 end Reg_Reset;
 
 architecture Behavioral of Reg_Reset is
-    
+    signal Done        : std_logic                    := '0';
     signal LVDS_R_ADDR : std_logic_vector(7 downto 0) := "10000000";
     signal LVDS_W_ADDR : std_logic_vector(7 downto 0) := (others =>'0');
     signal STATE_ADDR  : std_logic_vector(1 downto 0) := (others =>'0');
@@ -40,7 +40,7 @@ begin
     Reg_Reset : process(LVDS_CLK)
         begin
             if rising_edge(LVDS_CLK) then
-                if (SYS_RES_N = '1') then
+                if (SYS_RES_N = '0' and Done = '0') then
                         STATE_ADDR <= STATE_ADDR + 1;  
                         
                         if (STATE_ADDR = "00")then 
@@ -60,7 +60,7 @@ begin
                             LVDS_W_ADDR <= LVDS_W_ADDR + 1;
                             STATE_ADDR  <= "00";
                         end if;
-                else
+                elsif (SYS_RES_N = '0' and Done = '1') then
                     LVDS_W      <= '0';
                     LVDS_R      <= '0';
                     LVDS_R_ADDR <= "10000000";
@@ -69,8 +69,19 @@ begin
                 end if;
             end if;                            
         end process; 
+        
+        Reset_Done : process(LVDS_CLK)
+        begin
+            if rising_edge(LVDS_CLK) then
+                if (LVDS_W_ADDR = "1111111") then
+                    Done <= '1';
+                elsif (SYS_RES_N = '1') then
+                    Done <= '0';
+                end if;
+            end if;               
+        end process; 
             
-        LVDS_ADDR <= "10000000"         when SYS_RES_N = '0' 
+        LVDS_ADDR <= "10000000"         when SYS_RES_N = '1' 
         else         LVDS_W_ADDR        when STATE_ADDR = "10" or STATE_ADDR = "11" 
         else         LVDS_R_ADDR ;  
         
