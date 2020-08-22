@@ -68,15 +68,15 @@ begin
     
         SPI_EN <= '0';
         SPI_IN <= '0';
-        SYS_RES_N <= '0';
+        SYS_RES_N <= '1';
         
         wait for T;
         
-        SYS_RES_N <= '1';
+        SYS_RES_N <= '0';
         
         wait for 1 us;
         
-        SYS_RES_N <= '0';
+        SYS_RES_N <= '1';
         
         wait for 0.5*T;
         
@@ -265,9 +265,55 @@ begin
         SPI_IN <= '1';
         wait for T;
         SPI_IN <= '0';
-        --addition
-       -- wait for T;
-        --SPI_IN <= '0';
+        
+        wait for T;
+        SPI_IN <= '0';
+        
+        wait for 17.5*T;
+        
+        -------------------------------
+        -- SPI Disable
+        -------------------------------
+
+        SPI_IN <= '0';
+        wait for 0.5*T;
+        SPI_EN <= '0';
+        wait for 3.5*T;
+        
+        -------------------------------
+        -- SPI Enable
+        -------------------------------
+        
+        SPI_EN <= '1';
+        
+        -------------------------------
+        --       SPI Read
+        -- Register 43 "0101011"
+        -------------------------------
+        
+        SPI_IN <= '0';
+        wait for T;
+        
+        -- Address --
+        
+        SPI_IN <= '0';
+        wait for T;
+        
+        SPI_IN <= '1';
+        wait for T;
+        SPI_IN <= '0';
+        wait for T;
+        
+        SPI_IN <= '1';
+        wait for T;
+        SPI_IN <= '0';
+        wait for T;
+        
+        SPI_IN <= '1';
+        wait for T;
+        SPI_IN <= '1';
+        wait for T;
+        SPI_IN <= '0';
         
         wait for 17.5*T;
         
@@ -282,9 +328,9 @@ begin
         -- System Reset
         -------------------------------
         
-        SYS_RES_N <= '1';
-        wait for 1 us;
         SYS_RES_N <= '0';
+        wait for 1 us;
+        SYS_RES_N <= '1';
         
         -------------------------------
         -- SPI Enable
