@@ -35,7 +35,7 @@ architecture Behavioral of SPI_Interface is
     
     signal Read_EN   : std_logic := '0';
     signal Counter_W : std_logic_vector (4 downto 0)  := "10111";
-    signal Counter_R : std_logic_vector (4 downto 0)  := "01111";
+    signal Counter_R : std_logic_vector (4 downto 0)  := "10000";
     signal Data_Reg  : std_logic_vector (23 downto 0) := (others => '0');
      
     alias  WnR_bit   : std_logic is data_reg(23);
@@ -47,18 +47,18 @@ begin
         
     Write_Counter : process(SPI_CLK)
     begin
-        if rising_edge(SPI_CLK) then
-            if (SPI_EN = '1') then
+        if (SPI_EN = '1') then
+            if rising_edge(SPI_CLK) then
                 if (Counter_W > "00000") then
                     Counter_W <= Counter_W - 1;
                 else
                     Counter_W <= "10111";
-                end if;
-            else
-                Counter_W <= "10111";
-            end if;                           
-        end if;   
-    end process;
+                end if;                     
+            end if;
+        else
+            Counter_W <= "10111";
+        end if;
+    end process;   
     
     Read_Counter : process(SPI_CLK)
     begin
