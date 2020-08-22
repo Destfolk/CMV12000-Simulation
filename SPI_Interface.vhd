@@ -47,16 +47,14 @@ begin
         
     Write_Counter : process(SPI_CLK)
     begin
-        if (SPI_EN = '1') then
-            if rising_edge(SPI_CLK) then
-                if (Counter_W > "00000") then
-                    Counter_W <= Counter_W - 1;
-                else
-                    Counter_W <= "10111";
-                end if;                     
-            end if;
-        else
+        if (SPI_EN = '0') then
             Counter_W <= "10111";
+        elsif rising_edge(SPI_CLK) then
+            if (Counter_W > "00000") then
+                Counter_W <= Counter_W - 1;
+            else
+                Counter_W <= "10111";
+            end if;                     
         end if;
     end process;   
     
