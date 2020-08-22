@@ -582,7 +582,7 @@ begin
 	    spi_clk => spi_clk,
 	    spi_in => spi_in,
 	    spi_out => spi_out,
-	    spi_en => spi_en );
+	    spi_en => emio_gpio_i(2) );
 	 
     --------------------------------------------------------------------
     -- CMV 12000 Sensor
@@ -590,7 +590,7 @@ begin
         
     CMV12K : entity work.CMV12k(Behavioral)
         port map(
-            SPI_EN    => spi_en, 
+            SPI_EN    => emio_gpio_o(1), 
             SPI_CLK   => spi_clk, 
             --
             LVDS_CLK  => cmv_lvds_clk, 
