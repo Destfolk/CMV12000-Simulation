@@ -33,7 +33,7 @@ package body Function_pkg is
         M : integer )
         return integer is
     begin
-        return  N*M+128;
+        return  128*N+M;
     end bra;
     
     function index (
