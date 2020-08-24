@@ -47,15 +47,17 @@ begin
         
     Write_Counter : process(SPI_CLK)
     begin
-        if (SPI_EN = '0') then
+        if (SPI_EN = '1') then
+            if rising_edge(SPI_CLK) then
+                if (Counter_W > "00000") then
+                    Counter_W <= Counter_W - 1;
+                else
+                    Counter_W <= "10111";
+                end if;                     
+            end if;
+        else
             Counter_W <= "10111";
-        elsif rising_edge(SPI_CLK) then
-            if (Counter_W > "00000") then
-                Counter_W <= Counter_W - 1;
-            else
-                Counter_W <= "10111";
-            end if;                     
-        end if;
+       end if;              
     end process;   
     
     Read_Counter : process(SPI_CLK)
@@ -86,8 +88,8 @@ begin
     
     Write_reg : process(SPI_CLK)
     begin
-        if falling_edge(SPI_CLK) then
-            if (Counter_W = "00001" and WnR_bit = '1') then
+        if rising_edge(SPI_CLK) then
+            if (Counter_W = "00000" and WnR_bit = '1') then
                 W_not_R <= '1';
             else
                 W_not_R <= '0';
