@@ -1,0 +1,1 @@
+create_clock -period 3.333 -name LVDS_CLK -waveform {0.000 1.667} [get_ports LVDS_CLK]
