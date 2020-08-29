@@ -23,6 +23,8 @@ package Function_pkg is
     function index (
         val : std_logic_vector )
         return integer;
+    
+    type senselx128   is array (natural range <>) of std_logic_vector(1535 downto 0);
         
 end Function_pkg;
 
