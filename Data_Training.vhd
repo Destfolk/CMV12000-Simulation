@@ -3,7 +3,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.all;
 use ieee.std_logic_unsigned.all;
 
-entity Data_Training is                         -- send MSB first
+entity Data_Training is                         -- sends MSB first
     Port ( LVDS_CLK : in  std_logic;
            IDLE     : in  std_logic;
            OH       : in  std_logic;            -- needs to lag 0.5*LVDS_CLK or modify the code and use falling edge
