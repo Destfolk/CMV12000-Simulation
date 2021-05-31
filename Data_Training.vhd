@@ -38,7 +38,7 @@ begin
                 else
                     TP_out <= TP2(0) & TP1(10 downto 0);
                     
-                    case BIT_MODE is
+                    case Bit_mode is
                         when "00" =>
                             TP2(11 downto 0) <= TP2(10 downto 0) & TP2(11);
                         when "01" =>
