@@ -7,6 +7,9 @@ entity Control_Channel is
     Port ( LVDS_CLK       : in  std_logic;
            IDLE           : in  std_logic;
            OH             : in  std_logic; -- needs to lead by 0.5*T
+           FOT            : in  std_logic;
+           INTE1          : in  std_logic;
+           INTE2          : in  std_logic;
            Output_mode    : in  std_logic_vector(5  downto 0);
            Channel_en     : in  std_logic_vector(2  downto 0);
            Channel_en_bot : in  std_logic_vector(31 downto 0);
@@ -25,7 +28,8 @@ architecture Behavioral of Control_Channel is
 begin
 
     Enable <= Channel_en_bot and Channel_en_bot;
-    CC_out(11 downto 3) <= "000010000";
+    CC_out(11 downto 6) <= "000010";
+    CC_out(5  downto 3) <= FOT & INTE1 & INTE2;
     CC_out(2  downto 0) <= CC;   
      
     process(LVDS_CLK)
