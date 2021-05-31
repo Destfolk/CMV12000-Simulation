@@ -29,9 +29,11 @@ begin
     process(LVDS_CLK)
     begin
         if rising_edge(LVDS_CLK) then
-            if (IDLE = '1' or TP1_EN = '1') then
+            if (IDLE = '1') then
                 TP1    <= TP1_data;
-                TP2    <= "0000" & not TP1(7 downto 0);
+                TP2    <= "0000" & not TP1_data(7 downto 0);
+                TP_out <= TP1;
+            elsif (TP1_EN = '1') then
                 TP_out <= TP1;
             elsif (TP2_EN = '1') then
                 if (fin_set = '0') then
