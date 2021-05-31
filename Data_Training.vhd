@@ -25,13 +25,13 @@ architecture Behavioral of Data_Training is
 begin
     TP1_EN <= not DVAL and LVAL;
     TP2_EN <= not (DVAL or LVAL);
-    TP2    <= "0000" & not TP1(7 downto 0);
     
     process(LVDS_CLK)
     begin
         if rising_edge(LVDS_CLK) then
             if (IDLE = '1' or TP1_EN = '1') then
                 TP1    <= TP1_data;
+                TP2    <= "0000" & not TP1(7 downto 0);
                 TP_out <= TP1;
             elsif (TP2_EN = '1') then
                 if (fin_set = '0') then
