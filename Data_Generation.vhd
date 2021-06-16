@@ -20,7 +20,8 @@ entity Data_Generation is
     Port ( LVDS_CLK : in  std_logic;
            IDLE     : in  std_logic;
            OH       : in  std_logic;
-           gen_out  : out senselx128(64 downto 1));
+           gen_out  : out senselx128(64 downto 1)
+           );
 end Data_Generation;
 
 architecture Behavioral of Data_Generation is
