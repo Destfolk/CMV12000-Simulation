@@ -24,26 +24,36 @@ entity Output_Channels is
            Bit_mode         : in  std_logic_vector(1  downto 0);
            Output_mode      : in  std_logic_vector(5  downto 0);
            Training_pattern : in  std_logic_vector(11 downto 0);
+           --
+           Channel_en       : in  std_logic_vector(2  downto 0);
            Channel_en_bot   : in  std_logic_vector(31 downto 0);
            Channel_en_top   : in  std_logic_vector(31 downto 0);
            --
-           DVAL             : out  std_logic;
-           LVAL             : out  std_logic;
+           Control_Channel  : out std_logic_vector(11 downto 0);
            ch_out           : out senselx128(64 downto 1)
            );
 end Output_Channels;
 
 architecture Behavioral of Output_Channels is 
 
-    signal TP_out      : std_logic_vector(11 downto 0);
-    signal gen_out     : senselx128(64 downto 1);
+    signal TP_out       : std_logic_vector(11 downto 0);
+    signal gen_out      : senselx128(64 downto 1);
     --
-    signal OH_Detect   : std_logic := '0';
-    signal IDlE_Detect : std_logic := '0';
-    signal New_row     : std_logic := '0';
-    signal Counter     : std_logic_vector(4 downto 0);
+    signal FOT          : std_logic := '0';
+    signal INTE1        : std_logic := '0';
+    signal INTE2        : std_logic := '0';
+    signal FVAL         : std_logic := '0';
+    signal LVAL         : std_logic := '0';
+    signal DVAL         : std_logic := '0';
+    --
+    signal OH_Detect    : std_logic := '0';
+    signal IDlE_Detect  : std_logic := '0';
+    signal New_row      : std_logic := '0';
+    signal Train_enable : std_logic := '0';
+    signal Counter      : std_logic_vector(4  downto 0);
+    signal Enable       : std_logic_vector(31 downto 0);
     
-begin
+begin  
 
     Data_Generation : entity work.Data_Generation(Behavioral)
     port map(
@@ -56,7 +66,7 @@ begin
     port map(
         LVDS_CLK          => LVDS_CLK,
         New_row           => New_row, 
-        Channel_en        => Channel_en_bot(0),
+        Train_enable      => Train_enable,
         Bit_mode          => Bit_mode,
         Training_pattern  => Training_pattern,
         TP_out            => TP_out);
@@ -112,5 +122,12 @@ begin
     DVAL    <= '1'                when not (OH or IDLE) = '1' else '0';
     LVAL    <= not New_row        when IDLE = '0'             else '0' ;
     ch_out  <= (others => TP_out) when (OH or IDLE) = '1'     else gen_out;
+    
+    Enable       <= Channel_en_bot or Channel_en_bot;
+    Train_enable <= '1' when Enable > 0 else '0';
+    
+    Control_Channel(11 downto 6) <= "000010";
+    Control_Channel(5  downto 3) <= FOT  & INTE1 & INTE2;
+    Control_Channel(2  downto 0) <= FVAL & LVAL  & DVAL when Channel_en(1) = '1' and Enable > 0 else "000"; 
     
 end Behavioral;
