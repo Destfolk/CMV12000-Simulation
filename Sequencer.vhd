@@ -101,6 +101,7 @@ architecture Behavioral of Sequencer is
         others => (others => '0'));
      
 begin
+    
     SPI_Port : process(SPI_CLK)
         begin
             if falling_edge(SPI_CLK) then
