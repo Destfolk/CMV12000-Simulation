@@ -17,17 +17,17 @@ library work;
 use work.Function_pkg.all;
 
 entity Reg_Reset is
-    Port (  LVDS_CLK  : in  std_logic;
-            SYS_RES_N : in  std_logic;
+    Port ( LVDS_CLK  : in  std_logic;
+           SYS_RES_N : in  std_logic;
             
-            LVDS_OUT  : in  std_logic_vector(15 downto 0);
-            LVDS_IN   : out std_logic_vector(15 downto 0);
+           LVDS_OUT  : in  std_logic_vector(15 downto 0);
+           LVDS_IN   : out std_logic_vector(15 downto 0);
             
-            LVDS_W    : out std_logic;
-            LVDS_R    : out std_logic;
+           LVDS_W    : out std_logic;
+           LVDS_R    : out std_logic;
             
-            LVDS_ADDR : out std_logic_vector(7 downto 0) := "10000000"
-            );
+           LVDS_ADDR : out std_logic_vector(7 downto 0) := "10000000"
+           );
 end Reg_Reset;
 
 architecture Behavioral of Reg_Reset is
