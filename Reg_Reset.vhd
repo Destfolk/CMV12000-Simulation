@@ -43,6 +43,7 @@ architecture Behavioral of Reg_Reset is
     signal SYS_RES_N_4 : std_logic;
     
 begin
+    
     Synchronizer : process(LVDS_CLK)
         begin
             if rising_edge(LVDS_CLK) then
