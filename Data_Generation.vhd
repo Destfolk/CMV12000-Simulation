@@ -31,14 +31,18 @@ architecture Behavioral of Data_Generation is
     signal Data_out    : senselx128(64 downto 1) := (others => (others => '0'));
     
 begin
-    gen_out <= Data_out;
+    
+    Edge_Detect : process(LVDS_CLK)
+    begin
+        if rising_edge(LVDS_CLK) then
+            OH_Detect   <= OH;
+            IDLE_Detect <= IDLE;   
+        end if;
+    end process;
     
     Dat_generation : process(LVDS_CLK)
     begin
-        OH_Detect   <= OH;
-        IDLE_Detect <= IDLE;
-        
-        if rising_edge(LVDS_CLK) then   
+        if rising_edge(LVDS_CLK) then
             if (IDLE_Detect = '0' and IDLE = '1') then
                 for x in 1 to 32 loop
                     Data_out(x)    <= Data_out(x) + x*128 - 2*128;
@@ -54,4 +58,7 @@ begin
             end if;
         end if;
     end process;
+
+    gen_out <= Data_out;
+    
 end Behavioral;
