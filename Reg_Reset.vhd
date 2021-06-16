@@ -101,10 +101,10 @@ begin
         end if;                            
     end process; 
             
-        LVDS_ADDR <= "10000000"         when Ready = '0' 
-        else         LVDS_W_ADDR        when STATE_ADDR = "10" or STATE_ADDR = "11" 
-        else         LVDS_R_ADDR ;  
-        
-        LVDS_IN   <= LVDS_OUT;    
+    LVDS_ADDR <= "10000000"         when Ready = '0' 
+    else         LVDS_W_ADDR        when STATE_ADDR = "10" or STATE_ADDR = "11" 
+    else         LVDS_R_ADDR ;  
+
+    LVDS_IN   <= LVDS_OUT;    
         
 end Behavioral;
