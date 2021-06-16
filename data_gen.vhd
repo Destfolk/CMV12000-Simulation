@@ -16,10 +16,10 @@ end data_gen;
 
 architecture Behavioral of data_gen is
 
-    signal row      : integer   :=  0;
-    signal Detect1  : std_logic := '0';
-    signal Detect2  : std_logic := '0';
-    signal dout     :senselx128(64 downto 1) := (others => (others => '0'));
+    signal row         : integer   :=  0;
+    signal IDLE_Detect : std_logic := '0';
+    signal OH_Detect   : std_logic := '0';
+    signal dout        :senselx128(64 downto 1) := (others => (others => '0'));
     
 begin
     
@@ -27,18 +27,18 @@ begin
     
     process(LVDS_CLK)
     begin
-        Detect1 <= IDLE;
-        Detect2 <= OH;
+        IDLE_Detect <= IDLE;
+        OH_Detect   <= OH;
         
         if rising_edge(LVDS_CLK) then   
-            if (Detect1 = '0' and IDLE = '1') then
+            if (IDLE_Detect = '0' and IDLE = '1') then
                 for x in 1 to 32 loop
                     dout(x)    <= dout(x) + x*128;
                     dout(x+32) <= dout(x+32) +(x+32)*128; 
                 end loop;
             elsif (row > 3072) then
                 dout <= (others => (others => '0'));
-            elsif (Detect2 = '0' and OH = '1') then
+            elsif (OH_Detect = '0' and OH = '1') then
                 row <= row + 2;
                 for x in 64 downto 1 loop
                     dout(x) <= dout(x) + 128;
