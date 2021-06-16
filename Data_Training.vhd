@@ -19,7 +19,7 @@ use work.Function_pkg.all;
 entity Data_Training is                         
     Port ( LVDS_CLK           : in  std_logic;
            New_row            : in  std_logic; -- TP12 is coincided with its rising edge -- 1 cycle Lag at its falling edge but shouldn't cause problems          
-           Channel_en         : in  std_logic;
+           Train_enable       : in  std_logic;
            Bit_mode           : in  std_logic_vector(1  downto 0);
            Training_pattern   : in  std_logic_vector(11 downto 0);
            TP_out             : out std_logic_vector(11 downto 0)
@@ -28,27 +28,27 @@ end Data_Training;
 
 architecture Behavioral of Data_Training is
 
-    signal Ch_Detect   : std_logic := '0';
-    signal Row_Detect  : std_logic := '0';
+    signal Row_Detect    : std_logic := '0';
+    signal Enable_Detect : std_logic := '0';
     
-    signal TP1         : std_logic_vector(11 downto 0);
-    signal TP2         : std_logic_vector(11 downto 0);
-    signal TP12        : std_logic_vector(11 downto 0);
+    signal TP1           : std_logic_vector(11 downto 0);
+    signal TP2           : std_logic_vector(11 downto 0);
+    signal TP12          : std_logic_vector(11 downto 0);
     
 begin
     
     Edge_Detect : process(LVDS_CLK)
     begin
         if rising_edge(LVDS_CLK) then
-            Ch_Detect  <= Channel_en;
-            Row_Detect <= New_row;
+            Row_Detect     <= New_row;
+            Enable_Detect  <= Train_enable;
         end if;
     end process;
     
     Pattern : process(LVDS_CLK)
     begin
         if rising_edge(LVDS_CLK) then
-            if (Ch_Detect = '0' and Channel_en = '1') then
+            if (Enable_Detect = '0' and Train_enable = '1') then
                 TP1    <= Training_pattern;
                 TP2    <= "0000" & not Training_pattern(7 downto 0);
             elsif (Row_Detect = '1' and New_row = '0') then
