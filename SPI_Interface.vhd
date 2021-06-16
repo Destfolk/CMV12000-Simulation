@@ -41,10 +41,7 @@ architecture Behavioral of SPI_Interface is
     alias  WnR_bit   : std_logic is data_reg(23);
     
 begin
-    ADDR          <= '0' & Data_Reg(22 downto 16);
-    TEMP_DATA_OUT <= Data_Reg(15 downto  0);
-    SPI_OUT       <= TEMP_DATA_IN(index(Counter_R)) when Read_EN = '1' else '0';
-        
+    
     Write_Counter : process(SPI_CLK)
     begin
         if (SPI_EN = '1') then
@@ -108,4 +105,8 @@ begin
         end if;
     end process;
     
+    ADDR          <= '0' & Data_Reg(22 downto 16);
+    TEMP_DATA_OUT <= Data_Reg(15 downto  0);
+    SPI_OUT       <= TEMP_DATA_IN(index(Counter_R)) when Read_EN = '1' else '0';
+        
 end Behavioral;
