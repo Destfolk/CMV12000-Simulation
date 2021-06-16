@@ -35,11 +35,7 @@ architecture Behavioral of Data_Training is
     signal TP2         : std_logic_vector(11 downto 0);
     signal TP12        : std_logic_vector(11 downto 0);
     
-    
-    
 begin
-    TP12   <=  TP1(10 downto 0) & TP2(0);
-    TP_out <= TP12 when New_row = '1' else TP1;
     
     Edge_Detect : process(LVDS_CLK)
     begin
@@ -72,4 +68,8 @@ begin
             end if; 
         end if;
     end process;   
+    
+    TP12   <=  TP1(10 downto 0) & TP2(0);
+    TP_out <= TP12 when New_row = '1' else TP1;
+    
 end Behavioral;
