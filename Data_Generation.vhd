@@ -41,7 +41,7 @@ begin
         end if;
     end process;
     
-    Dat_generation : process(LVDS_CLK)
+    Data_generation : process(LVDS_CLK)
     begin
         if rising_edge(LVDS_CLK) then
             if (IDLE_Detect = '0' and IDLE = '1') then
