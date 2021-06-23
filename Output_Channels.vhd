@@ -50,7 +50,7 @@ architecture Behavioral of Output_Channels is
     --
     signal OH           : std_logic := '0';
     signal OH_Detect    : std_logic := '0';
-    signal IDlE_Detect  : std_logic := '0';
+    signal IDLE_Detect  : std_logic := '0';
     signal New_row      : std_logic := '0';
     signal Train_enable : std_logic := '0';
     signal Counter      : std_logic_vector(4  downto 0);
@@ -88,7 +88,7 @@ begin
     begin
         if rising_edge(LVDS_CLK) then
             OH_Detect   <= OH;
-            IDlE_Detect <= IDLE;
+            IDLE_Detect <= IDLE;
             TP_Idle     <= Training_pattern;
         end if;
     end process;
