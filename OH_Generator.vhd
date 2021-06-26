@@ -34,7 +34,7 @@ architecture Behavioral of OH_Generator is
     --
     signal Mode_Count   : std_logic_vector(3 downto 0) := (others => '1');
     signal OH_Counter   : std_logic_vector(3 downto 0) := (others => '0');
-    signal Data_Counter : std_logic_vector(4 downto 0) := (others => '1');
+    signal Data_Counter : std_logic_vector(6 downto 0) := (others => '1');
     
 begin
 
@@ -52,19 +52,19 @@ begin
                 when "00" =>
                     if (IDLE_fall = '1') then
                         Mode_Count <= "1011";
-                    elsif(Data_Counter = "00000") then
+                    elsif(Data_Counter = "0000000") then
                         Mode_Count <= "1100";
                     end if;
                 when "01" =>
                     if (IDLE_fall = '1') then
                         Mode_Count <= "1001";
-                    elsif(Data_Counter = "00000") then
+                    elsif(Data_Counter = "0000000") then
                         Mode_Count <= "1010";
                     end if;
                 when "10" =>
                     if (IDLE_fall = '1') then
                         Mode_Count <= "0111";
-                    elsif(Data_Counter = "00000") then
+                    elsif(Data_Counter = "0000000") then
                         Mode_Count <= "1000";
                     end if;
                 when others =>
@@ -78,7 +78,7 @@ begin
         if rising_edge(LVDS_CLK) then
             if (IDLE = '1') then
                 Data_Counter <= (others => '1');
-            elsif (OH_Counter = Mode_Count or Data_Counter < "11111") then
+            elsif (OH_Counter = Mode_Count or Data_Counter < "1111111") then
                 Data_Counter <= Data_Counter + 1;
             end if;
         end if;
@@ -90,7 +90,7 @@ begin
             if (IDLE = '1') then
                 OH_Counter <= (others => '0');
                 OH_reg <= '0';
-            elsif (Data_Counter = "11111") then
+            elsif (Data_Counter = "1111111") then
                 case Bit_mode is
                     when "00" =>
                         if (OH_Counter = Mode_Count) then
