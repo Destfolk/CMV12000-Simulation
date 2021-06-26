@@ -36,6 +36,7 @@ architecture Behavioral of Data_Generation is
     
     signal FVAL_Detect1   : std_logic_vector(11 downto 0):= (others => '0');
     signal FVAL_Detect2   : std_logic := '0';
+    signal FVAL_Detect3   : std_logic;
     
 begin
 
@@ -58,13 +59,13 @@ begin
         if rising_edge(LVDS_CLK) then
             if (IDLE_Detect = '0' and IDLE = '1') then
                 Row <= 0;
-                for x in 1 to 32 loop
-                    Data_out(x)    <= Data_out(x) + x*128 - 2*128;
-                    Data_out(x+32) <= Data_out(x+32) +(x+32)*128 - 2*128; 
+                for x in 0 to 31 loop
+                    Data_out(x+1)    <= Data_out(x+1)  + x*128;
+                    Data_out(x+33)   <= Data_out(x+33) + x*128; 
                 end loop;
             elsif (Row > 3073) then
                 Data_out <= (others => (others => '0'));
-            elsif (OH_Detect = '0' and OH = '1') then
+            elsif (FVAL_Detect3 = '1') then
                 case Output_mode is
                     when "000000" =>
                         Row <= Row + 2;
@@ -89,7 +90,8 @@ begin
         end if;
     end process;
     
-    FVAL    <= '1' when FVAL_Detect1(11) = '1' and Row < 3073  else '0';
-    gen_out <= Data_out;
+    FVAL_Detect3 <= '1' when FVAL_Detect1(11) = '1' and Row < 3073  else '0';
+    FVAL         <= FVAL_Detect3;
+    gen_out      <= Data_out;
     
 end Behavioral;
