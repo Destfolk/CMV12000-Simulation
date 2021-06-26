@@ -96,7 +96,7 @@ begin
     OH_Counter : process(LVDS_CLK)
     begin
         if rising_edge(LVDS_CLK) then
-            if (IDlE_Detect = '0' and IDLE = '1') then 
+            if (IDLE_Detect = '0' and IDLE = '1') then 
                 Counter <= (others => '0');
             elsif (OH_Detect = '1' and OH = '0') then
                 case Output_mode(4 downto 0) is
@@ -132,146 +132,73 @@ begin
         end if;
     end process;
     
-    Bot_Channels : process(Channel_en_bot, Output_mode, OH, IDLE, TP_Idle, TP_out, gen_out)
+    Output_Channels : process(TP_Idle, Output_mode, OH, IDLE, TP_out, gen_out)
     begin
-        for x in 1 to 32 loop
-            if (Channel_en_bot(x - 1) = '0') then
-                ch_out_bot(x) <= (others => '0');
-            else
-                case Output_mode(4 downto 0) is
-                    when "00000" =>
-                        if ((OH or IDLE) = '1') then
-                            ch_out_bot(x) <= TP_out;
-                        else
-                            ch_out_bot(x) <= gen_out(x);
-                        end if;
-                    when "00001" =>
-                        if (x = 1 or x = 3 or x = 5 or x = 7 or x = 9 or x = 11 or x = 13 or x = 15 or
-                            x = 17 or x = 19 or x = 21 or x = 23 or x = 25 or x = 27 or x = 29 or x = 31) then
-                            if ((OH or IDLE) = '1') then
-                                ch_out_bot(x) <= TP_out;
-                            else 
-                                ch_out_bot(x) <= gen_out(x);
-                            end if;
-                        else
-                            ch_out_bot(x) <= TP_Idle;
-                        end if;
-                    when "00011" =>
-                        if (x = 1 or x = 5 or x = 9 or x = 13 or x = 17 or x = 21 or x = 25 or x = 29) then
-                            if ((OH or IDLE) = '1') then
-                                ch_out_bot(x) <= TP_out;
-                            else 
-                                ch_out_bot(x) <= gen_out(x);
-                            end if;
-                        else
-                            ch_out_bot(x) <= TP_Idle;
-                        end if;
-                    when "00111" =>
-                        if (x = 1 or x = 9 or x = 17 or x = 25) then
-                            if ((OH or IDLE) = '1') then
-                                ch_out_bot(x) <= TP_out;
-                            else 
-                                ch_out_bot(x) <= gen_out(x);
-                            end if;
-                        else
-                            ch_out_bot(x) <= TP_Idle;
-                        end if;
-                    when "01111" =>
-                        if (x = 1 or x = 17) then
-                            if ((OH or IDLE) = '1') then
-                                ch_out_bot(x) <= TP_out;
-                            else 
-                                ch_out_bot(x) <= gen_out(x);
-                            end if;
-                        else
-                            ch_out_bot(x) <= TP_Idle;
-                        end if;
-                    when "11111" =>
-                        if (x = 1) then
-                            if ((OH or IDLE) = '1') then
-                                ch_out_bot(x) <= TP_out;
-                            else 
-                                ch_out_bot(x) <= gen_out(x);
-                            end if;
-                        else
-                            ch_out_bot(x) <= TP_Idle;
-                        end if;
-                    when others =>
-                        null;
-                end case;
-            end if;
-        end loop;   
-    end process;
+    ch_out_bot <= (others => TP_Idle);
+    ch_out_top <= (others => TP_Idle);
     
-    Top_Channels : process(Channel_en_top, Output_mode, OH, IDLE, TP_Idle, TP_out, gen_out)
-    begin
-        for x in 1 to 32 loop
-            if (Channel_en_top(x - 1) = '0') then
-                ch_out_top(x) <= (others => '0');
-            else
-                case Output_mode(4 downto 0) is
-                    when "00000" =>
-                        if ((OH or IDLE) = '1') then
-                            ch_out_top(x) <= TP_out;
-                        else
-                            ch_out_top(x) <= gen_out(x + 32);
-                        end if;
-                    when "00001" =>
-                        if (x = 1 or x = 3 or x = 5 or x = 7 or x = 9 or x = 11 or x = 13 or x = 15 or
-                            x = 17 or x = 19 or x = 21 or x = 23 or x = 25 or x = 27 or x = 29 or x = 31) then
-                            if ((OH or IDLE) = '1') then
-                                ch_out_top(x) <= TP_out;
-                            else 
-                                ch_out_top(x) <= gen_out(x + 32);
-                            end if;
-                        else
-                            ch_out_top(x) <= TP_Idle;
-                        end if;
-                    when "00011" =>
-                        if (x = 1 or x = 5 or x = 9 or x = 13 or x = 17 or x = 21 or x = 25 or x = 29) then
-                            if ((OH or IDLE) = '1') then
-                                ch_out_top(x) <= TP_out;
-                            else 
-                                ch_out_top(x) <= gen_out(x + 32);
-                            end if;
-                        else
-                            ch_out_top(x) <= TP_Idle;
-                        end if;
-                    when "00111" =>
-                        if (x = 1 or x = 9 or x = 17 or x = 25) then
-                            if ((OH or IDLE) = '1') then
-                                ch_out_top(x) <= TP_out;
-                            else 
-                                ch_out_top(x) <= gen_out(x + 32);
-                            end if;
-                        else
-                            ch_out_top(x) <= TP_Idle;
-                        end if;
-                    when "01111" =>
-                        if (x = 1 or x = 17) then
-                            if ((OH or IDLE) = '1') then
-                                ch_out_top(x) <= TP_out;
-                            else 
-                                ch_out_top(x) <= gen_out(x + 32);
-                            end if;
-                        else
-                            ch_out_top(x) <= TP_Idle;
-                        end if;
-                    when "11111" =>
-                        if (x = 1) then
-                            if ((OH or IDLE) = '1') then
-                                ch_out_top(x) <= TP_out;
-                            else 
-                                ch_out_top(x) <= gen_out(x + 32);
-                            end if;
-                        else
-                            ch_out_top(x) <= TP_Idle;
-                        end if;
-                    when others =>
-                        null;
-                end case;
-            end if;
-        end loop;   
+    case Output_mode(4 downto 0) is
+        when "00000" =>
+            for x in 0 to 31 loop
+                if ((OH or IDLE) = '1') then
+                    ch_out_bot(x+1) <= TP_out;
+                    ch_out_top(x+1) <= TP_out;
+                else
+                    ch_out_bot(x+1) <= gen_out(x+1);
+                    ch_out_top(x+1) <= gen_out(x+33);
+                end if;
+            end loop;
+        when "00001" =>
+            for x in 0 to 15 loop
+                if ((OH or IDLE) = '1') then
+                    ch_out_bot(2*x+1) <= TP_out;
+                    ch_out_top(2*x+1) <= TP_out;
+                else
+                    ch_out_bot(2*x+1) <= gen_out(2*x+1);
+                    ch_out_top(2*x+1) <= gen_out(2*x+33);
+                end if;
+            end loop;
+        when "00011" =>
+            for x in 0 to 7 loop
+                if ((OH or IDLE) = '1') then
+                    ch_out_bot(4*x+1) <= TP_out;
+                    ch_out_top(4*x+1) <= TP_out;
+                else
+                    ch_out_bot(4*x+1) <= gen_out(4*x+1);
+                    ch_out_top(4*x+1) <= gen_out(4*x+33);
+                end if;
+            end loop;
+        when "00111" =>
+            for x in 0 to 3 loop
+                if ((OH or IDLE) = '1') then
+                    ch_out_bot(8*x+1) <= TP_out;
+                    ch_out_top(8*x+1) <= TP_out;
+                else
+                    ch_out_bot(8*x+1) <= gen_out(8*x+1);
+                    ch_out_top(8*x+1) <= gen_out(8*x+33);
+                end if;
+            end loop;
+        when "01111" =>
+            for x in 0 to 1 loop
+                if ((OH or IDLE) = '1') then
+                    ch_out_bot(16*x+1) <= TP_out;
+                    ch_out_top(16*x+1) <= TP_out;
+                else
+                    ch_out_bot(16*x+1) <= gen_out(16*x+1);
+                    ch_out_top(16*x+1) <= gen_out(16*x+33);
+                end if;
+            end loop;
+        when "11111" =>
+                if ((OH or IDLE) = '1') then
+                    ch_out_bot(1) <= TP_out;
+                    ch_out_top(1) <= TP_out;
+                else
+                    ch_out_bot(1) <= gen_out(1);
+                    ch_out_top(1) <= gen_out(33);
+                end if;
+        when others =>
+            null;
+    end case;
     end process;
     
     Enable       <= Channel_en_bot or Channel_en_bot;
