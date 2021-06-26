@@ -76,7 +76,7 @@ begin
                         if (New_row = '1') then
                             Row <= Row + 1;
                             for x in 64 downto 1 loop
-                                Data_out(x) <= Data_out(x) + 128*x;
+                                Data_out(x) <= Data_out(x) + x*128;
                             end loop;
                         else
                             for x in 64 downto 1 loop
