@@ -3277,7 +3277,7 @@ begin
     scan_rload <= event_event(2);
     scan_arm <= event_event(3);
 
-    Channels : entity work.Output_Channels(Behavioral)
+    Data_Channels : entity work.Output_Channels(Behavioral)
     port map(
         LVDS_CLK          => cmv_lvds_clk,
         IDLE              => emio_gpio_o(0), 
