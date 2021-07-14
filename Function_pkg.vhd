@@ -14,33 +14,33 @@ use IEEE.NUMERIC_STD.all;
 use ieee.std_logic_unsigned.all;
 
 package Function_pkg is
-    
+        
     function bra (
-        N : integer;
-        M : integer )
-        return integer;
+        N : natural;
+        M : natural )
+        return natural;
         
     function index (
         val : std_logic_vector )
-        return integer;
+        return natural;
     
-    type senselx128   is array (natural range <>) of std_logic_vector(1535 downto 0);
+    type senselx128 is array (natural range <>) of std_logic_vector(11 downto 0);
         
 end Function_pkg;
 
 package body Function_pkg is
 
     function bra (
-        N : integer;
-        M : integer )
-        return integer is
+        N : natural;
+        M : natural )
+        return natural is
     begin
         return  128*N+M;
     end bra;
     
     function index (
         val : std_logic_vector )
-        return integer is
+        return natural is
     begin
         return to_integer(unsigned(val));
     end index;            
