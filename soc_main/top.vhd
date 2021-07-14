@@ -302,7 +302,7 @@ architecture RTL of top is
     --------------------------------------------------------------------
     -- CMV Parallel Data Signals
     --------------------------------------------------------------------
-
+    
     signal par_data : par12_a (CHANNELS downto 0);
     signal par_data_e : par12_a (CHANNELS downto 0);
     signal par_data_o : par12_a (CHANNELS downto 0);
@@ -1547,7 +1547,7 @@ begin
 
     cmv_outclk <= not idelay_out(CHANNELS + 1);
 
-    ser_to_par_inst : entity work.ser_to_par
+    /*ser_to_par_inst : entity work.ser_to_par
 	generic map (
 	    CHANNELS => CHANNELS + 1 )
 	port map (
@@ -1562,7 +1562,7 @@ begin
 	    par_enable	  => par_enable,	-- out
 	    par_data	  => par_data,		-- out
 	    --
-	    bitslip	  => serdes_bitslip(CHANNELS downto 0) );
+	    bitslip	  => serdes_bitslip(CHANNELS downto 0) );*/
 
     phase_proc : process (serdes_clkdiv)
 	variable phase_v : std_logic := '0';
@@ -3277,4 +3277,20 @@ begin
     scan_rload <= event_event(2);
     scan_arm <= event_event(3);
 
+    channel : entity work.Output_Channels(Behavioral)
+    port map(
+        LVDS_CLK          => cmv_lvds_clk,
+        IDLE              => emio_gpio_o(0), 
+        --
+        Bit_mode          => "00",
+        Output_mode       => "000001",
+        Training_pattern  => "100100110101",
+        --
+        Channel_en        => (others => '1'),
+        Channel_en_bot    => (others => '1'),
+        Channel_en_top    => (others => '1'),
+        --
+        Control_Channel   => par_ctrl,
+        ch_out            => par_data(CHANNELS - 1 downto 0) );
+        
 end RTL;
