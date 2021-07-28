@@ -26,6 +26,7 @@ entity Idle_Generator is
            INTE1      : out std_logic;
            INTE2      : out std_logic;*/
            Row        : out  std_logic_vector(11 downto 0);
+           z       : out std_logic;
            Idle       : out std_logic := '1'
            );
 end Idle_Generator;
@@ -33,7 +34,8 @@ end Idle_Generator;
 architecture Behavioral of Idle_Generator is
 
     signal x : std_logic := '0';
-    
+    signal y : std_logic := '0';  
+    --signal z : std_logic := '0';     
 begin
 
     process(LVDS_CLK)
@@ -48,6 +50,20 @@ begin
                 end if;
             elsif (Row > 3073) then
                     x    <= '0';
+            end if;
+        end if;
+    end process;
+    
+        process(LVDS_CLK)
+    begin
+        if rising_edge(LVDS_CLK) then
+            if (z = '0') then
+                if (T_EXP1 = '1') then
+                    z    <= '1';
+                    y    <= '1';
+                else
+                    y    <= '0';
+                end if;
             end if;
         end if;
     end process;

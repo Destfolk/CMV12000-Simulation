@@ -26,47 +26,22 @@ end OH_Generator;
 
 architecture Behavioral of OH_Generator is
 
-    signal OH_reg       : std_logic := '0';
-    --
-    signal IDLE_fall    : std_logic;
-    signal IDLE_rise    : std_logic;
-    signal IDlE_Detect  : std_logic := '1';
-    --
     signal Mode_Count   : std_logic_vector(3 downto 0) := (others => '1');
     signal OH_Counter   : std_logic_vector(3 downto 0) := (others => '0');
     signal Data_Counter : std_logic_vector(6 downto 0) := (others => '1');
     
 begin
 
-    Edge_Detect : process(LVDS_CLK)
-    begin
-        if rising_edge(LVDS_CLK) then
-            IDlE_Detect <= IDlE;
-        end if;
-    end process;
-    
     Mode_Adjustment : process(LVDS_CLK)
     begin
         if rising_edge(LVDS_CLK) then
             case Bit_mode is
                 when "00" =>
-                    if (IDLE_fall = '1') then
-                        Mode_Count <= "1011";
-                    elsif(Data_Counter = "0000000") then
                         Mode_Count <= "1100";
-                    end if;
                 when "01" =>
-                    if (IDLE_fall = '1') then
-                        Mode_Count <= "1001";
-                    elsif(Data_Counter = "0000000") then
                         Mode_Count <= "1010";
-                    end if;
                 when "10" =>
-                    if (IDLE_fall = '1') then
-                        Mode_Count <= "0111";
-                    elsif(Data_Counter = "0000000") then
                         Mode_Count <= "1000";
-                    end if;
                 when others =>
                     null;
             end case;
@@ -87,48 +62,14 @@ begin
     OH_Count : process(LVDS_CLK)
     begin
         if rising_edge(LVDS_CLK) then
-            if (IDLE = '1') then
+            if (IDLE = '1' or OH_Counter = Mode_Count) then
+                OH         <= '0';
                 OH_Counter <= (others => '0');
-                OH_reg <= '0';
             elsif (Data_Counter = "1111111") then
-                case Bit_mode is
-                    when "00" =>
-                        if (OH_Counter = Mode_Count) then
-                            OH_reg <= '0';
-                            OH_Counter <= (others => '0');
-                        else
-                            OH_reg <= '1';
-                            OH_Counter <= OH_Counter + 1;
-                        end if;
-                    when "01" =>
-                        if (OH_Counter = Mode_Count) then
-                            OH_reg <= '0';
-                            OH_Counter <= (others => '0');
-                        else
-                            OH_reg <= '1';
-                            OH_Counter <= OH_Counter + 1;
-                        end if;
-                    when "10" =>
-                        if (OH_Counter = Mode_Count) then
-                            OH_reg <= '0';
-                            OH_Counter <= (others => '0');
-                        else
-                            OH_reg <= '1';
-                            OH_Counter <= OH_Counter + 1;
-                        end if;
-                    when others =>
-                        null;
-                end case;
+                OH         <= '1';
+                OH_Counter <= OH_Counter + 1;
             end if;
         end if;
     end process;
-
-    IDLE_fall <= IDlE_Detect and not IDLE;
-    IDLE_rise <= not IDlE_Detect and IDLE;
-    
-    OH <= not IDlE when IDLE_fall = '1'
-    else  not IDlE when IDLE_rise = '1'
-    else  '1'      when OH_reg    = '1' 
-    else  '0';
     
 end Behavioral;
