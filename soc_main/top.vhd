@@ -260,6 +260,8 @@ architecture RTL of top is
 
     signal lvds_clk : std_ulogic;
     signal word_clk : std_ulogic;
+    
+    signal word2_clk : std_ulogic;
 
     signal cmv_outclk : std_ulogic;
 
@@ -1262,12 +1264,13 @@ begin
 
     lvds_pll_inst : entity work.lvds_pll (RTL_250MHZ)
 	port map (
-	    ref_clk_in => cmv_outclk,
+	    ref_clk_in => cmv_lvds_clk,--cmv_outclk,
 	    --
 	    pll_locked => lvds_pll_locked,
 	    --
 	    lvds_clk => lvds_clk,
-	    word_clk => word_clk );
+	    word_clk => word_clk,
+	    word2_clk => word2_clk );
 
     hdmi_pll_inst : entity work.hdmi_pll
 	generic map (
@@ -1590,7 +1593,7 @@ begin
 
 
     GEN_PAT: for I in CHANNELS - 1 downto 0 generate
-	par_pattern(I) <= reg_pattern;
+	par_pattern(I) <= "100100110101";
     end generate;
 
     par_pattern(CHANNELS) <= x"080";
@@ -3279,8 +3282,9 @@ begin
 
     Data_Channels : entity work.Output_Channels(Behavioral)
     port map(
-        LVDS_CLK          => cmv_lvds_clk,
-        IDLE              => emio_gpio_o(0), 
+        LVDS_CLK          => word2_clk,
+        LVDS_CLK2          => lvds_clk,
+        T_EXP1              => cmv_t_exp1, 
         --
         Bit_mode          => "00",
         Output_mode       => "000001",
@@ -3291,6 +3295,10 @@ begin
         Channel_en_top    => (others => '1'),
         --
         Control_Channel   => par_ctrl,
-        ch_out            => par_data(CHANNELS - 1 downto 0) );
+        patt              => emio_gpio_i(36 downto 25),
+        ch_out1           => emio_gpio_i(12 downto 1),
+        ch_out2           => emio_gpio_i(24 downto 13),  
+        ch_out            => par_data(CHANNELS - 1 downto 0),
+        z                 => emio_gpio_i(0)  );
         
 end RTL;
