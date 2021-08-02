@@ -77,7 +77,7 @@ entity top is
 	hdmi_south_d_p : out std_logic_vector (2 downto 0);
 	hdmi_south_d_n : out std_logic_vector (2 downto 0);
 	--
-    hdmi_north_clk_p : out std_logic;
+    	hdmi_north_clk_p : out std_logic;
 	hdmi_north_clk_n : out std_logic;
 	--
 	hdmi_north_d_p : out std_logic_vector (5 downto 0);
