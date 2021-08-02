@@ -77,11 +77,17 @@ entity top is
 	hdmi_south_d_p : out std_logic_vector (2 downto 0);
 	hdmi_south_d_n : out std_logic_vector (2 downto 0);
 	--
-    	hdmi_north_clk_p : out std_logic;
+    /*	hdmi_north_clk_p : out std_logic;
 	hdmi_north_clk_n : out std_logic;
 	--
-	hdmi_north_d_p : out std_logic_vector (5 downto 0);
-	hdmi_north_d_n : out std_logic_vector (5 downto 0);	
+	hdmi_north_d_p : out std_logic_vector (2 downto 0);
+	hdmi_north_d_n : out std_logic_vector (2 downto 0);	*/
+	
+	analyzer_clk_p : out std_logic;
+	analyzer_clk_n : out std_logic;
+	--
+	analyzer_p : out std_logic_vector (5 downto 0);
+	analyzer_n : out std_logic_vector (5 downto 0);
 	--
 	debug_tmds: out std_logic_vector (3 downto 0);
 	debug : out std_logic_vector (3 downto 0)
@@ -2882,16 +2888,16 @@ begin
 
     OBUFDS_clk_inst1 : OBUFDS
 	port map (
-	    O => hdmi_north_clk_p,
-	    OB => hdmi_north_clk_n,
-	    I => tmds_north_io(3) );
+	    O  => analyzer_clk_p,
+	    OB => analyzer_clk_n,
+	    I  => tmds_north_io(3) );
 
     OBUFDS_GEN1: for I in 5 downto 0 generate
 	OBUFDS_data_inst1 : OBUFDS
 	    port map (
-		O => hdmi_north_d_p(I),
-		OB => hdmi_north_d_n(I),
-		I => tmds_north_io(5 - I) );
+		O  => analyzer_p(I),
+		OB => analyzer_n(I),
+		I  => tmds_north_io(5 - I) );
     end generate;	
 
     dil_proc : process (hdmi_clk)
@@ -3307,6 +3313,7 @@ begin
     port map(
         CLK          => word2_clk,
         Rst          => emio_gpio_o(37),
-        Output_IOs   => );
+        Output_IOs74   => analyzer_n(3 downto 0),
+        Output_IOs30   => analyzer_p(3 downto 0));
         
 end RTL;
