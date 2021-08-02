@@ -77,11 +77,11 @@ entity top is
 	hdmi_south_d_p : out std_logic_vector (2 downto 0);
 	hdmi_south_d_n : out std_logic_vector (2 downto 0);
 	--
-    /*	hdmi_north_clk_p : out std_logic;
+    hdmi_north_clk_p : out std_logic;
 	hdmi_north_clk_n : out std_logic;
 	--
-	hdmi_north_d_p : out std_logic_vector (2 downto 0);
-	hdmi_north_d_n : out std_logic_vector (2 downto 0);	*/
+	hdmi_north_d_p : out std_logic_vector (5 downto 0);
+	hdmi_north_d_n : out std_logic_vector (5 downto 0);	
 	--
 	debug_tmds: out std_logic_vector (3 downto 0);
 	debug : out std_logic_vector (3 downto 0)
@@ -2880,19 +2880,19 @@ begin
 		I => tmds_south_io(2 - I) );
     end generate;
 
-/*  OBUFDS_clk_inst1 : OBUFDS
+    OBUFDS_clk_inst1 : OBUFDS
 	port map (
 	    O => hdmi_north_clk_p,
 	    OB => hdmi_north_clk_n,
 	    I => tmds_north_io(3) );
 
-    OBUFDS_GEN1: for I in 2 downto 0 generate
+    OBUFDS_GEN1: for I in 5 downto 0 generate
 	OBUFDS_data_inst1 : OBUFDS
 	    port map (
 		O => hdmi_north_d_p(I),
 		OB => hdmi_north_d_n(I),
-		I => tmds_north_io(2 - I) );
-    end generate;	*/
+		I => tmds_north_io(5 - I) );
+    end generate;	
 
     dil_proc : process (hdmi_clk)
 	variable dil_addr_v : unsigned (11 downto 0)
@@ -3284,7 +3284,7 @@ begin
     port map(
         LVDS_CLK          => word2_clk,
         LVDS_CLK2          => lvds_clk,
-        T_EXP1              => cmv_t_exp1, 
+        T_EXP1              => cmv_frame_req, 
         --
         Bit_mode          => "00",
         Output_mode       => "000001",
@@ -3300,5 +3300,13 @@ begin
         ch_out2           => emio_gpio_i(24 downto 13),  
         ch_out            => par_data(CHANNELS - 1 downto 0),
         z                 => emio_gpio_i(0)  );
+        
+       trial : entity work.Bit_Counter(Behavioral)
+        Generic map ( Size => 8
+    )
+    port map(
+        CLK          => word2_clk,
+        Rst          => emio_gpio_o(37),
+        Output_IOs   => );
         
 end RTL;
