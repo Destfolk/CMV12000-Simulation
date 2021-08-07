@@ -17,24 +17,24 @@ library work;
 use work.Function_pkg.all;
 
 entity OH_Generator is
-    Port ( LVDS_CLK : in  std_logic;
-           IDLE     : in  std_logic;
-           Bit_mode : in  std_logic_vector(1 downto 0);
+    Port ( Word_Clk : in  std_logic;
+           Idle     : in  std_logic;
+           Bit_Mode : in  std_logic_vector(1 downto 0);
            OH       : out std_logic
            );
 end OH_Generator;
 
 architecture Behavioral of OH_Generator is
 
-    signal Mode_Count   : std_logic_vector(3 downto 0) := (others => '1');
+    signal Mode_Count   : std_logic_vector(3 downto 0) := "0001"; --(others => '1');
     signal OH_Counter   : std_logic_vector(3 downto 0) := (others => '0');
     signal Data_Counter : std_logic_vector(6 downto 0) := (others => '1');
     
 begin
 
-    Mode_Adjustment : process(LVDS_CLK)
+    /*Mode_Adjustment : process(Word_Clk)
     begin
-        if rising_edge(LVDS_CLK) then
+        if rising_edge(Word_Clk) then
             case Bit_mode is
                 when "00" =>
                         Mode_Count <= "1100";
@@ -46,12 +46,12 @@ begin
                     null;
             end case;
         end if;
-    end process;
+    end process;*/
     
-    Data_Count : process(LVDS_CLK)
+    Data_Count : process(Word_Clk)
     begin
-        if rising_edge(LVDS_CLK) then
-            if (IDLE = '1') then
+        if rising_edge(Word_Clk) then
+            if (Idle = '1') then
                 Data_Counter <= (others => '1');
             elsif (OH_Counter = Mode_Count or Data_Counter < "1111111") then
                 Data_Counter <= Data_Counter + 1;
@@ -59,10 +59,10 @@ begin
         end if;
     end process;
     
-    OH_Count : process(LVDS_CLK)
+    OH_Count : process(Word_Clk)
     begin
-        if rising_edge(LVDS_CLK) then
-            if (IDLE = '1' or OH_Counter = Mode_Count) then
+        if rising_edge(Word_Clk) then
+            if (Idle = '1' or OH_Counter = Mode_Count) then
                 OH         <= '0';
                 OH_Counter <= (others => '0');
             elsif (Data_Counter = "1111111") then

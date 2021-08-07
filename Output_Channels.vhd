@@ -17,13 +17,13 @@ library work;
 use work.Function_pkg.all;
 
 entity Output_Channels is
-    Port ( LVDS_CLK         : in  std_logic;
-           LVDS_CLK2        : in  std_logic;
+    Port ( Word_Clk         : in  std_logic;
+           Word_Clk2        : in  std_logic;
            T_EXP1           : in  std_logic;
            --
-           Bit_mode         : in  std_logic_vector(1  downto 0);
-           Output_mode      : in  std_logic_vector(5  downto 0);
-           Training_pattern : in  std_logic_vector(11 downto 0);
+           Bit_Mode         : in  std_logic_vector(1  downto 0);
+           Output_Mode      : in  std_logic_vector(5  downto 0);
+           Training_Pattern : in  std_logic_vector(11 downto 0);
            --
            Channel_en       : in  std_logic_vector(2  downto 0);
            Channel_en_bot   : in  std_logic_vector(31 downto 0);
@@ -34,7 +34,12 @@ entity Output_Channels is
            ch_out1          : out std_logic_vector(11 downto 0);
            ch_out2          : out std_logic_vector(11 downto 0);
            ch_out           : out senselx128(32 downto 1);
-           z           : out  std_logic
+           --
+           DVALx             : out  std_logic;
+           LVALx             : out  std_logic;
+           FVALx             : out  std_logic;
+           OHx               : out  std_logic;
+           New_Rowx          : out  std_logic
            );
 end Output_Channels;
 
@@ -43,12 +48,12 @@ architecture Behavioral of Output_Channels is
     -----------------------------------------------------
     -- Signal Detection
     -----------------------------------------------------
-    signal IDLE             : std_logic;
-    signal IDLE_Detect      : std_logic := '0';
-    signal IDLE_Detect_2    : std_logic := '0';
-    signal IDLE_Detect_3    : std_logic := '0';
-    signal IDLE_Detection_2 : std_logic := '0';
-    signal IDLE_Detection_3 : std_logic := '0';
+    signal Idle             : std_logic;
+    signal Idle_Detect      : std_logic := '0';
+    signal Idle_Detect_2    : std_logic := '0';
+    signal Idle_Detect_3    : std_logic := '0';
+    signal Idle_Detection_2 : std_logic := '0';
+    signal Idle_Detection_3 : std_logic := '0';
     
     signal OH               : std_logic := '0';
     signal OH_Detect        : std_logic := '0';
@@ -62,8 +67,9 @@ architecture Behavioral of Output_Channels is
     -----------------------------------------------------
     -- 
     -----------------------------------------------------
-    signal Train_enable     : std_logic := '0';
+    signal Train_Enable     : std_logic := '0';
     signal Counter          : std_logic_vector(4  downto 0);
+    signal Row              : std_logic_vector(11 downto 0);
     signal Enable           : std_logic_vector(31 downto 0);
     
     -----------------------------------------------------
@@ -80,56 +86,52 @@ architecture Behavioral of Output_Channels is
     -- Output Signals
     -----------------------------------------------------
     signal TP_Idle          : std_logic_vector(11 downto 0);
-    signal TP_out           : std_logic_vector(11 downto 0);
+    signal TP_Out           : std_logic_vector(11 downto 0);
     signal gen_out          : senselx128(64 downto 1);
     signal ch_out_bot       : senselx128(32 downto 1);
     signal ch_out_top       : senselx128(32 downto 1);
     
-    
-    
-    signal Row          : std_logic_vector(11 downto 0);
 begin  
 
     Idle_Generator : entity work.Idle_Generator(Behavioral)
     port map(
-        LVDS_CLK   => LVDS_CLK2,
+        Word_Clk2  => Word_Clk2,
         T_EXP1     => T_EXP1,
         Row        => Row, 
-        IDLE       => IDLE, 
-        z       => z );
+        Idle       => Idle);
         
     OH_Generator : entity work.OH_Generator(Behavioral)
     port map(
-        LVDS_CLK => LVDS_CLK,
-        IDLE     => IDLE,
-        Bit_mode => Bit_mode, 
+        Word_Clk => Word_Clk,
+        Idle     => Idle,
+        Bit_Mode => Bit_Mode, 
         OH       => OH );
         
     Data_Training : entity work.Data_Training(Behavioral)
     port map(
-        LVDS_CLK          => LVDS_CLK,
+        Word_Clk          => Word_Clk,
         New_Row           => New_Row, 
-        Train_enable      => Train_enable,
-        Bit_mode          => Bit_mode,
-        Training_pattern  => Training_pattern,
-        TP_out            => TP_out);
+        Train_Enable      => Train_Enable,
+        Bit_Mode          => Bit_Mode,
+        Training_Pattern  => Training_Pattern,
+        TP_Out            => TP_Out);
         
     Data_Generation : entity work.Data_Generation(Behavioral)
     port map(
-        LVDS_CLK    => LVDS_CLK,
-        IDLE        => IDLE, 
+        Word_Clk    => Word_Clk,
+        Idle        => Idle, 
         OH          => OH, 
         New_Row     => New_Row_2,
         DVAL        => DVAL, 
         LVAL        => LVAL, 
-        Output_mode => Output_mode,
+        Output_Mode => Output_Mode,
         FVAL        => FVAL, 
         Row         => Row, 
         gen_out     => gen_out);
     
-    Edge_Detect : process(LVDS_CLK)
+    Edge_Detect : process(Word_Clk)
     begin
-        if rising_edge(LVDS_CLK) then
+        if rising_edge(Word_Clk) then
             IDLE_Detect   <= IDLE;
             IDLE_Detect_2 <= IDLE_Detect;
             IDLE_Detect_3 <= IDLE_Detect_2;
@@ -145,10 +147,10 @@ begin
         end if;
     end process;
     
-    OH_Counter : process(LVDS_CLK)
+    OH_Counter : process(Word_Clk)
     begin
-        if rising_edge(LVDS_CLK) then
-            if (IDLE_Detect = '0' and IDLE = '1') then 
+        if rising_edge(Word_Clk) then
+            if (Idle_Detect = '0' and Idle = '1') then 
                 Counter <= (others => '0');
             elsif (OH_Detect = '1' and OH = '0') then
                 case Output_mode(4 downto 0) is
@@ -184,16 +186,16 @@ begin
         end if;
     end process;
     
-    Output_Channels : process(LVDS_CLK)
+    Output_Channels : process(Word_Clk)
     begin
-        if rising_edge(LVDS_CLK) then
+        if rising_edge(Word_Clk) then
             ch_out_bot <= (others => TP_Idle);
             ch_out_top <= (others => TP_Idle);
             
             case Output_mode(4 downto 0) is
                 when "00000" =>
                     for x in 0 to 31 loop
-                        if (IDLE_Detection_2 = '0' and OH_Detect= '0') then
+                        if (Idle_Detection_2 = '0' and OH_Detect= '0') then
                             ch_out_bot(x+1) <= gen_out(x+1);
                             ch_out_top(x+1) <= gen_out(x+33);
                         else
@@ -203,7 +205,7 @@ begin
                     end loop;
                 when "00001" =>
                     for x in 0 to 15 loop
-                        if (IDLE_Detection_2 = '0' and OH_Detect= '0') then
+                        if (Idle_Detection_2 = '0' and OH_Detect= '0') then
                             ch_out_bot(2*x+1) <= gen_out(2*x+1);
                             ch_out_top(2*x+1) <= gen_out(2*x+33);
                         else
@@ -213,7 +215,7 @@ begin
                     end loop;
                 when "00011" =>
                     for x in 0 to 7 loop
-                        if (IDLE_Detection_2 = '0' and OH_Detect= '0') then
+                        if (Idle_Detection_2 = '0' and OH_Detect= '0') then
                             ch_out_bot(4*x+1) <= gen_out(4*x+1);
                             ch_out_top(4*x+1) <= gen_out(4*x+33);
                         else
@@ -223,7 +225,7 @@ begin
                     end loop;
                 when "00111" =>
                     for x in 0 to 3 loop
-                        if (IDLE_Detection_2 = '0' and OH_Detect= '0') then
+                        if (Idle_Detection_2 = '0' and OH_Detect= '0') then
                             ch_out_bot(8*x+1) <= gen_out(8*x+1);
                             ch_out_top(8*x+1) <= gen_out(8*x+33);
                         else
@@ -233,7 +235,7 @@ begin
                     end loop;
                 when "01111" =>
                     for x in 0 to 1 loop
-                        if (IDLE_Detection_2 = '0' and OH_Detect= '0') then
+                        if (Idle_Detection_2 = '0' and OH_Detect= '0') then
                             ch_out_bot(16*x+1) <= gen_out(16*x+1);
                             ch_out_top(16*x+1) <= gen_out(16*x+33);
                         else
@@ -242,7 +244,7 @@ begin
                         end if;
                     end loop;
                 when "11111" =>
-                        if (IDLE_Detection_2 = '0' and OH_Detect= '0') then
+                        if (Idle_Detection_2 = '0' and OH_Detect= '0') then
                             ch_out_bot(1) <= gen_out(1);
                             ch_out_top(1) <= gen_out(33);
                         else
@@ -259,16 +261,16 @@ begin
     -- Enable
     -------------------
     Enable           <= Channel_en_bot or Channel_en_bot;
-    IDLE_Detection_2 <= IDLE or IDLE_Detect or IDLE_Detect_2;
-    IDLE_Detection_3 <= IDLE or IDLE_Detect or IDLE_Detect_2 or IDLE_Detect_3;
+    Idle_Detection_2 <= Idle or Idle_Detect or Idle_Detect_2;
+    Idle_Detection_3 <= Idle or Idle_Detect or Idle_Detect_2 or Idle_Detect_3;
     
-    Train_enable <= '1' when Enable > 0        else '0';    
+    Train_Enable <= '1' when Enable > 0        else '0';    
     New_Row      <= OH  when Counter = "00000" else '0';
     -------------------
     -- Control Channel
     -------------------
-    DVAL    <= '1'                when not (IDLE_Detection_3 or OH_Detect_2) = '1' else '0';
-    LVAL    <= not New_Row_2      when      IDLE_Detection_3                 = '0' else '0' ;
+    DVAL    <= '1'                when not (Idle_Detection_3 or OH_Detect_2) = '1' else '0';
+    LVAL    <= not New_Row_2      when      Idle_Detection_3                 = '0' else '0' ;
     
     Control_Channel(11 downto 6) <= "000010";
     Control_Channel(5  downto 3) <= FOT  & INTE1 & INTE2;
@@ -280,6 +282,14 @@ begin
     patt    <= Training_pattern;
     ch_out2 <= ch_out_bot(2);
     ch_out1 <= ch_out_bot(1);
-    ch_out  <= ch_out_bot ;--and Channel_en_bot;-- & ch_out_bot;
+    ch_out  <= ch_out_bot ;     -- ch_out_top & ch_out_bot;
+    
+    -------------
+  /*DVALx    <= DVAL;         
+    LVALx    <= LVAL;       
+    FVALx    <= FVAL;  
+    OHx      <= OH;
+    New_Rowx <= New_Row;*/
+    -------------
     
 end Behavioral;
