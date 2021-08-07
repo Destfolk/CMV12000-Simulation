@@ -285,11 +285,11 @@ begin
     ch_out  <= ch_out_bot ;     -- ch_out_top & ch_out_bot;
     
     -------------
-  /*DVALx    <= DVAL;         
+    DVALx    <= DVAL;         
     LVALx    <= LVAL;       
     FVALx    <= FVAL;  
     OHx      <= OH;
-    New_Rowx <= New_Row;*/
+    New_Rowx <= New_Row;
     -------------
     
 end Behavioral;
