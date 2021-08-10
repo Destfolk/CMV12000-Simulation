@@ -82,7 +82,7 @@ entity top is
 	--
 	hdmi_north_d_p : out std_logic_vector (2 downto 0);
 	hdmi_north_d_n : out std_logic_vector (2 downto 0);	*/
-	analyzer_d : out std_logic_vector (5 downto 0)
+	analyzer_d : out std_logic_vector (6 downto 0)
 	--
 	--debug_tmds: out std_logic_vector (3 downto 0)
 	--debug : out std_logic_vector (3 downto 0) --3 downto 0
@@ -1595,7 +1595,7 @@ begin
 
 
     GEN_PAT: for I in CHANNELS - 1 downto 0 generate
-	par_pattern(I) <= reg_pattern;
+	par_pattern(I) <= "100100110101";
     end generate;
 
     par_pattern(CHANNELS) <= x"080";
@@ -3290,7 +3290,7 @@ begin
         --
         Bit_mode          => "00",
         Output_mode       => "000001",
-        Training_pattern  => reg_pattern,
+        Training_pattern  => "100100110101",
         --
         Channel_en        => (others => '1'),
         Channel_en_bot    => (others => '1'),
@@ -3301,12 +3301,15 @@ begin
         ch_out1           => emio_gpio_i(12 downto 1),
         ch_out2           => emio_gpio_i(24 downto 13),  
         ch_out            => par_data(CHANNELS - 1 downto 0),
-        DVALx             => analyzer_d(1),
-        LVALx             => analyzer_d(2),
-        FVALx             => analyzer_d(3),
-        OHx               => analyzer_d(0), 
-        New_Rowx          => analyzer_d(4));
-        
+        DVALx             => analyzer_d(0),
+        LVALx             => analyzer_d(1),
+        FVALx             => analyzer_d(2));
+        --OHx               => analyzer_d(0), 
+        --New_Rowx          => analyzer_d(4));
+        analyzer_d(3) <= cseq_frmreq;
+        analyzer_d(4) <= cmv_frame_req;
+        analyzer_d(5) <= cmv_active;
+        analyzer_d(6) <= sync_done;
        /*trial : entity work.Bit_Counter(Behavioral)
         Generic map ( Size => 10
     )
