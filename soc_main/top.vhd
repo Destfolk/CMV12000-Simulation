@@ -1779,7 +1779,7 @@ begin
     fifo_chop_inst : entity work.fifo_chop (RTL_SHIFT)
 	port map (
 	    par_clk => serdes_clk,
-	    par_enable => '1',
+	    par_enable => '1',--par_enable,
 	    par_data => remap_data,
 	    --
 	    par_ctrl => remap_ctrl,
@@ -3300,19 +3300,23 @@ begin
         patt              => emio_gpio_i(36 downto 25),
         ch_out1           => emio_gpio_i(12 downto 1),
         ch_out2           => emio_gpio_i(24 downto 13),  
-        ch_out            => par_data(CHANNELS - 1 downto 0),
-        DVALx             => analyzer_d(0),
-        LVALx             => analyzer_d(1),
-        FVALx             => analyzer_d(2));
+        ch_out            => par_data(CHANNELS - 1 downto 0));
+        --DVALx             => analyzer_d(0),
+        --LVALx             => analyzer_d(1),
+        --FVALx             => analyzer_d(2));
         --Idlex             => analyzer_d(3));
         --OHx               => analyzer_d(5)); 
         --New_Rowx          => analyzer_d(4));
         --analyzer_d(3) <= cseq_frmreq;
-        analyzer_d(4) <= cmv_frame_req;
-        analyzer_d(5) <= cmv_active;
+        --analyzer_d(4) <= cmv_frame_req;
+        analyzer_d(6) <= cmv_active;
         --analyzer_d(6) <= sync_done;
-        analyzer_d(3) <= par_ctrl(0);
-        analyzer_d(6) <= data_ctrl(0);
+        analyzer_d(0) <= par_ctrl(0);
+        analyzer_d(1) <= par_ctrl(1);
+        analyzer_d(2) <= par_ctrl(2);
+        analyzer_d(3) <= remap_ctrl(0);
+        analyzer_d(4) <= remap_ctrl(1);
+        analyzer_d(5) <= remap_ctrl(2);
        /*trial : entity work.Bit_Counter(Behavioral)
         Generic map ( Size => 10
     )
