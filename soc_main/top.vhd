@@ -3304,12 +3304,15 @@ begin
         DVALx             => analyzer_d(0),
         LVALx             => analyzer_d(1),
         FVALx             => analyzer_d(2));
-        --OHx               => analyzer_d(0), 
+        --Idlex             => analyzer_d(3));
+        --OHx               => analyzer_d(5)); 
         --New_Rowx          => analyzer_d(4));
-        analyzer_d(3) <= cseq_frmreq;
+        --analyzer_d(3) <= cseq_frmreq;
         analyzer_d(4) <= cmv_frame_req;
         analyzer_d(5) <= cmv_active;
-        analyzer_d(6) <= sync_done;
+        --analyzer_d(6) <= sync_done;
+        analyzer_d(3) <= par_ctrl(0);
+        analyzer_d(6) <= data_ctrl(0);
        /*trial : entity work.Bit_Counter(Behavioral)
         Generic map ( Size => 10
     )
