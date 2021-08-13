@@ -1779,7 +1779,7 @@ begin
     fifo_chop_inst : entity work.fifo_chop (RTL_SHIFT)
 	port map (
 	    par_clk => serdes_clk,
-	    par_enable => par_enable,
+	    par_enable => '1',
 	    par_data => remap_data,
 	    --
 	    par_ctrl => remap_ctrl,
