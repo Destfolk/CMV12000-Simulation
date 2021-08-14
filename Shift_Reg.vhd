@@ -18,11 +18,11 @@ use work.Function_pkg.all;
 
 entity Shift_Reg is
     Generic ( Size : natural := 6
-    );
+        );
     Port ( Clk     : in  std_logic;
            Rst     : in  std_logic;
            Out_Bit : out std_logic
-          );
+        );
 end Shift_Reg;
 
 architecture Behavioral of Shift_Reg is
