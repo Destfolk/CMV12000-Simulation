@@ -94,8 +94,8 @@ end entity top;
 architecture RTL of top is
 
     attribute KEEP_HIERARCHY of RTL : architecture is "TRUE";
-signal debug : std_logic_vector (3 downto 0);
-signal debug_tmds : std_logic_vector (3 downto 0);
+    signal debug : std_logic_vector (3 downto 0);
+    signal debug_tmds : std_logic_vector (3 downto 0);
     signal clk_100 : std_logic;
 
     signal debug_data : std_logic_vector (3 downto 0);
@@ -1779,7 +1779,7 @@ begin
     fifo_chop_inst : entity work.fifo_chop (RTL_SHIFT)
 	port map (
 	    par_clk => serdes_clk,
-	    par_enable => '1',--par_enable,
+	    par_enable => par_enable,
 	    par_data => remap_data,
 	    --
 	    par_ctrl => remap_ctrl,
@@ -3314,9 +3314,17 @@ begin
         analyzer_d(0) <= par_ctrl(0);
         analyzer_d(1) <= par_ctrl(1);
         analyzer_d(2) <= par_ctrl(2);
-        analyzer_d(3) <= remap_ctrl(0);
-        analyzer_d(4) <= remap_ctrl(1);
-        analyzer_d(5) <= remap_ctrl(2);
+        analyzer_d(3) <= data_ctrl(0);
+        analyzer_d(4) <= data_ctrl(1);
+        analyzer_d(5) <= data_ctrl(2);
+        
+        fifo_enable : entity work.Shift_Reg(Behavioral)
+        Generic map ( Size => 6 )
+        port map(
+            Clk          => serdes_clk,
+            Rst          => '0',
+            Out_Bit      => par_enable);
+        
        /*trial : entity work.Bit_Counter(Behavioral)
         Generic map ( Size => 10
     )
