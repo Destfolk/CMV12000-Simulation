@@ -50,8 +50,8 @@ entity top is
 	--
 	spi_en : out std_ulogic;
 	spi_clk : out std_ulogic;
-	spi_in : out std_ulogic;
-	spi_out : in std_ulogic;
+	--spi_in : out std_ulogic;
+	--spi_out : in std_ulogic;
 	--
 	cmv_clk : out std_ulogic;
 	cmv_sys_res_n : out std_ulogic;
@@ -933,7 +933,19 @@ architecture RTL of top is
 
     signal dmem_addr : std_logic_vector (11 downto 0);
     signal dmem_dout : std_logic_vector (8 downto 0);
-
+    
+    --------------------------------------------------------------------
+    -- SPI Signals
+    --------------------------------------------------------------------
+    
+    signal spi_in  : std_ulogic;
+    signal spi_out : std_ulogic;
+    
+    
+    signal ch_out_bot       : par12_a(32 downto 1);
+    signal ch_out_top       : par12_a(32 downto 1);
+    signal tp               : std_logic_vector(11 downto 0);
+    
 begin
 
     --------------------------------------------------------------------
@@ -1595,7 +1607,7 @@ begin
 
 
     GEN_PAT: for I in CHANNELS - 1 downto 0 generate
-	par_pattern(I) <= "100100110101";
+	par_pattern(I) <= tp;
     end generate;
 
     par_pattern(CHANNELS) <= x"080";
@@ -3282,10 +3294,39 @@ begin
     scan_rload <= event_event(2);
     scan_arm <= event_event(3);
 
-    Data_Channels : entity work.Output_Channels(Behavioral)
+    CMV12K : entity work.CMV12k(Behavioral)
+        port map(
+            SPI_CLK   => spi_clk, 
+            SPI_EN    => spi_en, 
+            --
+            LVDS_CLK  => cmv_lvds_clk, 
+            SYS_RES_N => emio_gpio_o(0),
+            --
+            SPI_IN    => spi_in,
+            SPI_OUT   => spi_out,
+            --
+            Word_Clk  => word2_clk,
+            T_EXP1    => cmv_frame_req,
+            tp        => tp,
+            par_ctrl  => par_ctrl,
+            par_data_top => ch_out_top,
+            par_data_bot => ch_out_bot);	
+    
+    process(ch_out_bot, ch_out_top)
+    begin
+        
+        for x in 15 downto 0 loop
+            par_data(x) <= ch_out_bot(2*x+1);
+        end loop; 
+        
+        for x in 15 downto 0 loop
+            par_data(x+16) <= ch_out_top(2*x+1);
+        end loop;
+    end process;
+    
+    /*Data_Channels : entity work.Output_Channels(Behavioral)
     port map(
         Word_Clk          => word2_clk,
-        Word_Clk2         => word_clk,
         T_EXP1            => cmv_frame_req, 
         --
         Bit_mode          => "00",
@@ -3297,19 +3338,11 @@ begin
         Channel_en_top    => (others => '1'),
         --
         Control_Channel   => par_ctrl,
-        patt              => emio_gpio_i(36 downto 25),
-        ch_out1           => emio_gpio_i(12 downto 1),
-        ch_out2           => emio_gpio_i(24 downto 13),  
-        ch_out            => par_data(CHANNELS - 1 downto 0));
-        --DVALx             => analyzer_d(0),
-        --LVALx             => analyzer_d(1),
-        --FVALx             => analyzer_d(2));
-        --Idlex             => analyzer_d(3));
-        --OHx               => analyzer_d(5)); 
-        --New_Rowx          => analyzer_d(4));
+        ch_out            => par_data(CHANNELS - 1 downto 0));*/
+        
+        -------------------------------------------------
         --analyzer_d(3) <= cseq_frmreq;
         --analyzer_d(4) <= cmv_frame_req;
-        analyzer_d(6) <= cmv_active;
         --analyzer_d(6) <= sync_done;
         analyzer_d(0) <= par_ctrl(0);
         analyzer_d(1) <= par_ctrl(1);
@@ -3317,6 +3350,8 @@ begin
         analyzer_d(3) <= data_ctrl(0);
         analyzer_d(4) <= data_ctrl(1);
         analyzer_d(5) <= data_ctrl(2);
+        analyzer_d(6) <= cmv_active;
+        -------------------------------------------------
         
         fifo_enable : entity work.Shift_Reg(Behavioral)
         Generic map ( Size => 6 )
