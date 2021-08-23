@@ -82,9 +82,10 @@ entity top is
 	--
 	hdmi_north_d_p : out std_logic_vector (2 downto 0);
 	hdmi_north_d_n : out std_logic_vector (2 downto 0);	*/
+	analyzer_d : out std_logic_vector (6 downto 0)
 	--
-	debug_tmds: out std_logic_vector (3 downto 0);
-	debug : out std_logic_vector (3 downto 0)
+	--debug_tmds: out std_logic_vector (3 downto 0)
+	--debug : out std_logic_vector (3 downto 0) --3 downto 0
     );
 
 end entity top;
@@ -93,7 +94,8 @@ end entity top;
 architecture RTL of top is
 
     attribute KEEP_HIERARCHY of RTL : architecture is "TRUE";
-
+    signal debug : std_logic_vector (3 downto 0);
+    signal debug_tmds : std_logic_vector (3 downto 0);
     signal clk_100 : std_logic;
 
     signal debug_data : std_logic_vector (3 downto 0);
@@ -260,6 +262,8 @@ architecture RTL of top is
 
     signal lvds_clk : std_ulogic;
     signal word_clk : std_ulogic;
+    
+    signal word2_clk : std_ulogic;
 
     signal cmv_outclk : std_ulogic;
 
@@ -1262,12 +1266,13 @@ begin
 
     lvds_pll_inst : entity work.lvds_pll (RTL_250MHZ)
 	port map (
-	    ref_clk_in => cmv_outclk,
+	    ref_clk_in => cmv_lvds_clk,--cmv_outclk,
 	    --
 	    pll_locked => lvds_pll_locked,
 	    --
 	    lvds_clk => lvds_clk,
-	    word_clk => word_clk );
+	    word_clk => word_clk,
+	    word2_clk => word2_clk );
 
     hdmi_pll_inst : entity work.hdmi_pll
 	generic map (
@@ -1590,7 +1595,7 @@ begin
 
 
     GEN_PAT: for I in CHANNELS - 1 downto 0 generate
-	par_pattern(I) <= reg_pattern;
+	par_pattern(I) <= "100100110101";
     end generate;
 
     par_pattern(CHANNELS) <= x"080";
@@ -3279,8 +3284,9 @@ begin
 
     Data_Channels : entity work.Output_Channels(Behavioral)
     port map(
-        LVDS_CLK          => cmv_lvds_clk,
-        IDLE              => emio_gpio_o(0), 
+        Word_Clk          => word2_clk,
+        Word_Clk2         => word_clk,
+        T_EXP1            => cmv_frame_req, 
         --
         Bit_mode          => "00",
         Output_mode       => "000001",
@@ -3291,6 +3297,40 @@ begin
         Channel_en_top    => (others => '1'),
         --
         Control_Channel   => par_ctrl,
-        ch_out            => par_data(CHANNELS - 1 downto 0) );
+        patt              => emio_gpio_i(36 downto 25),
+        ch_out1           => emio_gpio_i(12 downto 1),
+        ch_out2           => emio_gpio_i(24 downto 13),  
+        ch_out            => par_data(CHANNELS - 1 downto 0));
+        --DVALx             => analyzer_d(0),
+        --LVALx             => analyzer_d(1),
+        --FVALx             => analyzer_d(2));
+        --Idlex             => analyzer_d(3));
+        --OHx               => analyzer_d(5)); 
+        --New_Rowx          => analyzer_d(4));
+        --analyzer_d(3) <= cseq_frmreq;
+        --analyzer_d(4) <= cmv_frame_req;
+        analyzer_d(6) <= cmv_active;
+        --analyzer_d(6) <= sync_done;
+        analyzer_d(0) <= par_ctrl(0);
+        analyzer_d(1) <= par_ctrl(1);
+        analyzer_d(2) <= par_ctrl(2);
+        analyzer_d(3) <= data_ctrl(0);
+        analyzer_d(4) <= data_ctrl(1);
+        analyzer_d(5) <= data_ctrl(2);
+        
+        fifo_enable : entity work.Shift_Reg(Behavioral)
+        Generic map ( Size => 6 )
+        port map(
+            Clk          => serdes_clk,
+            Rst          => '0',
+            Out_Bit      => par_enable);
+        
+       /*trial : entity work.Bit_Counter(Behavioral)
+        Generic map ( Size => 10
+    )
+    port map(
+        CLK          => word2_clk,
+        Rst          => emio_gpio_o(37),
+        Output_IOs   => analyzer_d(9 downto 0));*/
         
 end RTL;

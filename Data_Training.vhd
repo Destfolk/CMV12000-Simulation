@@ -17,12 +17,12 @@ library work;
 use work.Function_pkg.all;
 
 entity Data_Training is                         
-    Port ( LVDS_CLK           : in  std_logic;
-           New_row            : in  std_logic; -- TP12 is coincided with its rising edge -- 1 cycle Lag at its falling edge but shouldn't cause problems          
-           Train_enable       : in  std_logic;
-           Bit_mode           : in  std_logic_vector(1  downto 0);
-           Training_pattern   : in  std_logic_vector(11 downto 0);
-           TP_out             : out std_logic_vector(11 downto 0)
+    Port ( Word_Clk         : in  std_logic; -- need to acount for Idle Signal
+           New_Row          : in  std_logic;         
+           Train_Enable     : in  std_logic;
+           Bit_Mode         : in  std_logic_vector(1  downto 0);
+           Training_Pattern : in  std_logic_vector(11 downto 0);
+           TP_Out           : out std_logic_vector(11 downto 0)
           );
 end Data_Training;
 
@@ -33,26 +33,25 @@ architecture Behavioral of Data_Training is
     
     signal TP1           : std_logic_vector(11 downto 0);
     signal TP2           : std_logic_vector(11 downto 0);
-    signal TP12          : std_logic_vector(11 downto 0);
     
 begin
     
-    Edge_Detect : process(LVDS_CLK)
+    Edge_Detect : process(Word_Clk)
     begin
-        if rising_edge(LVDS_CLK) then
-            Row_Detect     <= New_row;
-            Enable_Detect  <= Train_enable;
+        if rising_edge(Word_Clk) then
+            Row_Detect     <= New_Row;
+            Enable_Detect  <= Train_Enable;
         end if;
     end process;
     
-    Pattern : process(LVDS_CLK)
+    Pattern : process(Word_Clk)
     begin
-        if rising_edge(LVDS_CLK) then
-            if (Enable_Detect = '0' and Train_enable = '1') then
-                TP1    <= Training_pattern;
-                TP2    <= "0000" & not Training_pattern(7 downto 0);
-            elsif (Row_Detect = '1' and New_row = '0') then
-                case Bit_mode is
+        if rising_edge(Word_Clk) then
+            if (Enable_Detect = '0' and Train_Enable = '1') then
+                TP1     <= Training_Pattern;
+                TP2     <= "0000" & not Training_Pattern(7 downto 0);
+            elsif (Row_Detect = '1' and New_Row = '0') then
+                case Bit_Mode is
                     when "00" =>
                         TP1(11 downto 0) <= TP1(10 downto 0) & TP1(11);
                         TP2(11 downto 0) <= TP2(0) & TP2(11 downto 1);
@@ -69,7 +68,15 @@ begin
         end if;
     end process;   
     
-    TP12   <=  TP1(10 downto 0) & TP2(0);
-    TP_out <= TP12 when New_row = '1' else TP1;
+    Output_Register : process(Word_Clk)
+    begin
+        if rising_edge(Word_Clk) then
+            if (New_Row = '1') then
+                TP_Out <= TP1(10 downto 0) & TP2(0);
+            else
+                TP_Out <= TP1;
+            end if;
+        end if;
+    end process;
     
 end Behavioral;

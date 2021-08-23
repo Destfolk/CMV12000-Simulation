@@ -27,7 +27,8 @@ entity lvds_pll is
 	pll_locked : out std_logic;		-- PLL locked
 	--
 	lvds_clk : out std_logic;		-- regenerated clock
-	word_clk : out std_logic		-- word clock
+	word_clk : out std_logic;		-- word clock
+	word2_clk : out std_logic
     );
 
 end entity lvds_pll;
@@ -178,6 +179,8 @@ architecture RTL_250MHZ of lvds_pll is
 
     signal pll_lvds_clk : std_logic;
     signal pll_word_clk : std_logic;
+    
+    signal pll_word2_clk : std_logic;
 
 begin
     pll_inst : PLLE2_BASE
@@ -186,9 +189,11 @@ begin
 	CLKFBOUT_MULT => 12,
 	CLKOUT0_DIVIDE => 1500/250,	-- 250MHz LVDS clock
 	CLKOUT1_DIVIDE => 1500/250*6,	-- 41.6MHz WORD clock
+	CLKOUT2_DIVIDE => 1500/250*12,	-- 20.8MHz WORD2 clock
 	--
 	CLKOUT0_PHASE => 0.0,
 	CLKOUT1_PHASE => 0.0,
+	CLKOUT2_PHASE => 0.0,
 	--
 	DIVCLK_DIVIDE => 1 )
     port map (
@@ -198,6 +203,7 @@ begin
 	--
 	CLKOUT0 => pll_lvds_clk,
 	CLKOUT1 => pll_word_clk,
+	CLKOUT2 => pll_word2_clk,
 
 	LOCKED => pll_locked,
 	PWRDWN => '0',
@@ -214,5 +220,10 @@ begin
 	port map (
 	    I => pll_word_clk,
 	    O => word_clk );
+
+    BUFG_word2_inst : BUFG
+	port map (
+	    I => pll_word2_clk,
+	    O => word2_clk );
 
 end RTL_250MHZ;
